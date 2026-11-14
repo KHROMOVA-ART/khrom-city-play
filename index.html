@@ -675,7 +675,8 @@ const SHADOW_M=new T.ShadowMaterial({opacity:.28});
 function flatLoc(o){
   const g=new T.Group(); g.visible=false; scene.add(g);
   const sc=new T.Mesh(new T.PlaneGeometry(400,400), SHADOW_M); sc.rotation.x=-Math.PI/2; sc.receiveShadow=true; g.add(sc);
-  const image=new Image(); image.src=o.src;
+  // crossOrigin: фон может прийти с другого адреса (веб-версия на githack → raw.githubusercontent); без него фото-режим не сохранит кадр
+  const image=new Image(); image.crossOrigin='anonymous'; image.src=o.src;
   return Object.assign({type:'2d', group:g, image, iw:1456, ih:816, obst:[], podium:null, speed:1.9, bg:'#D9B994', spawnYaw:0}, o);
 }
 LOCS.street = flatLoc({

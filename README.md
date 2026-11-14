@@ -1,5 +1,5 @@
 # KHROM City — игра для тестеров
 
-Играть: https://khromova-art.github.io/khrom-city-play/
+Играть: https://raw.githack.com/KHROMOVA-ART/khrom-city-play/main/index.html
 
 Здесь только собранная страница игры. Исходники и документы — в закрытом репозитории.
