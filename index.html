@@ -248,11 +248,11 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div class="brand">
         <div class="wordmark">KHROM City</div>
         <div class="metro">
-          <button class="station" id="station" aria-expanded="false" aria-controls="metroMenu"><i class="dot"></i><b id="stName">Автодом</b><span class="arrow">куда ▾</span></button>
+          <button class="station" id="station" aria-expanded="false" aria-controls="metroMenu"><i class="dot"></i><b id="stName">Квартира</b><span class="arrow">куда ▾</span></button>
           <div class="metro-menu" id="metroMenu" hidden>
             <div class="label">куда</div>
             <ol>
-              <li><button data-go="autodom"><i></i>Автодом</button></li>
+              <li><button data-go="home"><i></i>Квартира</button></li>
               <li><button data-go="street"><i></i>Улица<small>тест</small></button></li>
               <li><button disabled><i></i>Карта остановок<small>скоро</small></button></li>
             </ol>
@@ -384,12 +384,12 @@ button{font:inherit;color:inherit;cursor:pointer}
         <b id="stubTitle">здесь будет ролик</b>
         <p class="note">Положи видео в папку <code>intro/</code> — оно заиграет здесь само. Пока раскадровка:</p>
         <ol>
-          <li>Герой работает в кафе в старом городке с советскими двориками.</li>
-          <li>Заходит гостья — и видно, что она не местная. Рассказывает про свой город.</li>
-          <li>После смены герой ищет этот город: KHROM City — и загорается поехать.</li>
-          <li>Сначала уехать не получается.</li>
-          <li>Событие, которое всё-таки сдвигает его в путь.</li>
-          <li>Отъезд на автодоме.</li>
+          <li>Дневник на столе, фото двора — зум в кафе: каждый день одни и те же лица, разговоры, кофе.</li>
+          <li>Звенит колокольчик — входит шикарная женщина. «Вы не местная?» — «Когда-то была».</li>
+          <li>Она когда-то сама стояла за стойкой и однажды решилась на мечту.</li>
+          <li>На доске воспоминаний — открытка с большим городом: KHROM City.</li>
+          <li>Дома: шкаф, сумка, и в залежах — старая карта. Внизу «мы», наверху KHROM City.</li>
+          <li>Она стирает пыль — появляется цель.</li>
         </ol>
         </div>
       </div>
@@ -559,114 +559,155 @@ function door(parent,color,signText){
   return {group:g, hit:d};
 }
 const LOCS={};
-/* Автодом — дом героя, который всегда с собой. Кукольный разрез: без передней стены и потолка.
-   Внутри шкаф (переодевание), кровать, столик у окна, кухонька; дверь ведёт на улицу. */
+/* Квартира Кнопки — дом в родном городке, сюда герой возвращается после каждого приключения.
+   Обычный российский вайб, чуть старый, но не слишком: паркет ёлочкой, обои, ковёр на стене над кроватью,
+   рабочий стол у окна с советской настольной лампой, батарея, полированный шкаф с зеркалом.
+   Кукольный разрез: без передней стены и потолка. Дверь в левой стене — во двор (пока на тестовую улицу). */
 function tiled(tex,rx,ry){ tex.wrapS=tex.wrapT=T.RepeatWrapping; tex.repeat.set(rx,ry); return tex; }
 function plainM(color,rough,map){ return new T.MeshStandardMaterial({color:lin(color), roughness:rough==null?.85:rough, map:map||null}); }
-LOCS.autodom = (function buildAutodom(){
+LOCS.home = (function buildHome(){
   const room=new T.Group(); scene.add(room);
   const X=4.2, ZB=-1.9, ZF=2.2, H=2.7;
-  // пол: светлые доски
-  const planks=tiled(canvasTex(128,128,(x,w,h)=>{ x.fillStyle='#D9B489'; x.fillRect(0,0,w,h);
-    for(let i=0;i<4;i++){ x.fillStyle=['#D3AC80','#DDBA90','#CFA77B','#D8B285'][i]; x.fillRect(0,i*32+1,w,30); }
-    x.strokeStyle='rgba(90,60,35,.35)'; x.lineWidth=2; for(let i=0;i<=4;i++){ x.beginPath(); x.moveTo(0,i*32); x.lineTo(w,i*32); x.stroke(); }
-    x.beginPath(); x.moveTo(40,0); x.lineTo(40,32); x.moveTo(100,32); x.lineTo(100,64); x.moveTo(20,64); x.lineTo(20,96); x.moveTo(84,96); x.lineTo(84,128); x.stroke(); }),4,2.5);
-  const floor=box(room,X*2+.24,.12,ZF-ZB,plainM('#ffffff',.9,planks),[0,-.06,(ZB+ZF)/2],null,true); floor.receiveShadow=true;
-  // стены: кремовые, снизу полоса
-  const wallM=plainM('#F1E4CF',.95), stripeM=plainM('#8E9C82',.8);
-  box(room,X*2+.24,H,.12,wallM,[0,H/2,ZB-.06],null,true);
-  [-1,1].forEach(sx=>{ box(room,.12,H,ZF-ZB,wallM,[sx*(X+.06),H/2,(ZB+ZF)/2],null,true);
-    box(room,.02,.16,ZF-ZB,stripeM,[sx*(X-.005),.9,(ZB+ZF)/2],null,true); });
-  box(room,X*2,.16,.02,stripeM,[0,.9,ZB+.005],null,true);
+  // пол: паркет ёлочкой, тёплый мёд
+  const parquet=tiled(canvasTex(128,128,(x,w,h)=>{ x.fillStyle='#C99A68'; x.fillRect(0,0,w,h);
+    const cols=['#C7965F','#D4A673','#BF8D5A','#CEA06C']; let k=0;
+    for(let c=0;c<4;c++){ x.save(); x.beginPath(); x.rect(c*32,0,32,h); x.clip();
+      const s=c%2?1:-1;
+      for(let y=-64;y<h+64;y+=16){ x.save(); x.translate(c*32+16,y); x.rotate(s*Math.PI/4); x.fillStyle=cols[k++%4]; x.fillRect(-28,-6,56,11); x.strokeStyle='rgba(90,55,30,.35)'; x.lineWidth=1.5; x.strokeRect(-28,-6,56,11); x.restore(); }
+      x.restore(); }
+    x.strokeStyle='rgba(90,55,30,.4)'; x.lineWidth=2; for(let c=0;c<=4;c++){ x.beginPath(); x.moveTo(c*32,0); x.lineTo(c*32,h); x.stroke(); } }),4,2.5);
+  const floor=box(room,X*2+.24,.12,ZF-ZB,plainM('#ffffff',.75,parquet),[0,-.06,(ZB+ZF)/2],null,true); floor.receiveShadow=true;
+  // обои: кремовые с полоской и мелкими ромбиками-цветочками
+  const paper=c=>tiled(canvasTex(64,64,(x,w,h)=>{ x.fillStyle='#EEDFC4'; x.fillRect(0,0,w,h);
+    x.fillStyle='rgba(176,140,98,.22)'; x.fillRect(0,0,6,h); x.fillRect(32,0,2,h);
+    x.fillStyle=c; [[18,14],[50,46]].forEach(([cx,cy])=>{ x.beginPath(); x.moveTo(cx,cy-6); x.lineTo(cx+5,cy); x.lineTo(cx,cy+6); x.lineTo(cx-5,cy); x.fill(); x.fillStyle='rgba(150,170,130,.6)'; x.fillRect(cx-1,cy+6,2,5); x.fillStyle=c; }); }),1,1);
+  const backPaper=plainM('#ffffff',.95,tiled(paper('#D69A8C'),12,4)), sidePaper=plainM('#ffffff',.95,tiled(paper('#D69A8C'),6,4));
+  box(room,X*2+.24,H,.12,backPaper,[0,H/2,ZB-.06],null,true);
+  [-1,1].forEach(sx=>box(room,.12,H,ZF-ZB,sidePaper,[sx*(X+.06),H/2,(ZB+ZF)/2],null,true));
+  // плинтус
+  const skirtM=plainM('#7A5236',.7);
+  box(room,X*2,.12,.04,skirtM,[0,.06,ZB+.02],null,true);
+  [-1,1].forEach(sx=>box(room,.04,.12,ZF-ZB,skirtM,[sx*(X-.02),.06,(ZB+ZF)/2],null,true));
   // срез стен — тёмная кромка, как у кукольного домика
   const edgeM=plainM('#4B3426',.9);
   box(room,X*2+.36,.08,.2,edgeM,[0,H+.04,ZB-.06],null,true);
   [-1,1].forEach(sx=>box(room,.2,.08,ZF-ZB+.1,edgeM,[sx*(X+.06),H+.04,(ZB+ZF)/2],null,true));
 
-  // окна с видом остановки: небо и холмы
-  const view=canvasTex(256,160,(x,w,h)=>{ const g=x.createLinearGradient(0,0,0,h); g.addColorStop(0,'#A9C3DE'); g.addColorStop(.6,'#E9DCC8'); g.addColorStop(1,'#F2D9B8'); x.fillStyle=g; x.fillRect(0,0,w,h);
-    x.fillStyle='#9DB08A'; x.beginPath(); x.moveTo(0,h*.72); x.quadraticCurveTo(w*.3,h*.45,w*.6,h*.66); x.quadraticCurveTo(w*.8,h*.55,w,h*.62); x.lineTo(w,h); x.lineTo(0,h); x.fill();
-    x.fillStyle='#7F946F'; x.beginPath(); x.moveTo(0,h*.85); x.quadraticCurveTo(w*.5,h*.7,w,h*.86); x.lineTo(w,h); x.lineTo(0,h); x.fill(); });
+  // окно во двор: напротив пятиэтажка, тополь
+  const view=canvasTex(256,180,(x,w,h)=>{ const g=x.createLinearGradient(0,0,0,h); g.addColorStop(0,'#B9CDE2'); g.addColorStop(1,'#EBDDC8'); x.fillStyle=g; x.fillRect(0,0,w,h);
+    x.fillStyle='#D9C3A5'; x.fillRect(20,40,200,h-40); x.fillStyle='#C9B08F'; x.fillRect(20,40,200,6);
+    for(let r=0;r<4;r++) for(let c=0;c<6;c++){ x.fillStyle=(r*6+c)%5===2?'#F2D06B':'#8FA4BC'; x.fillRect(32+c*32,58+r*30,18,18); x.fillStyle='#EFE6D6'; x.fillRect(30+c*32,76+r*30,22,3); }
+    x.fillStyle='#8E9C82'; x.beginPath(); x.ellipse(214,70,34,52,0,0,Math.PI*2); x.fill(); x.fillStyle='#7F946F'; x.beginPath(); x.ellipse(226,96,22,34,0,0,Math.PI*2); x.fill();
+    x.fillStyle='#6B4A36'; x.fillRect(212,110,5,h-110); });
   const glassM=new T.MeshBasicMaterial({map:view, toneMapped:false});
-  const frameM=M('vinyl','#FBF5EC');
-  const gingham=c=>tiled(canvasTex(64,64,(x,w,h)=>{ x.fillStyle='#FBF5EC'; x.fillRect(0,0,w,h); x.fillStyle=c; x.globalAlpha=.45; x.fillRect(0,0,w/2,h); x.fillRect(0,0,w,h/2); x.globalAlpha=.35; x.fillRect(0,0,w/2,h/2); x.globalAlpha=1; }),1,1);
-  const curtainM=plainM('#ffffff',.95,tiled(gingham('#E9A9A6'),3,4));
-  [-1.55,.75].forEach(cx=>{
-    const win=new T.Group(); win.position.set(cx,1.62,ZB+.01); room.add(win);
-    const gl=new T.Mesh(new T.PlaneGeometry(1.3,.8), glassM); gl.position.z=.005; win.add(gl);
-    box(win,1.46,.08,.08,frameM,[0,.44,.03],null,true); box(win,1.46,.08,.08,frameM,[0,-.44,.03],null,true);
-    box(win,.08,.96,.08,frameM,[-.69,0,.03],null,true); box(win,.08,.96,.08,frameM,[.69,0,.03],null,true); box(win,.05,.8,.05,frameM,[0,0,.03],null,true);
-    box(win,1.6,.1,.16,frameM,[0,-.5,.07]); // подоконник
-    [-1,1].forEach(s=>box(win,.26,1.05,.05,curtainM,[s*.86,.04,.08],null,true));
-  });
-  // гирлянда над окнами
-  const bulbM=new T.MeshStandardMaterial({color:lin('#fff4e2'), emissive:lin('#ffe2b0'), emissiveIntensity:2});
-  for(let i=0;i<11;i++){ const x=-3.6+i*.72, y=2.42-Math.sin(i/10*Math.PI*3)*.05;
-    const b=new T.Mesh(G('gbulb',()=>new T.SphereGeometry(.045,10,8)), bulbM); b.position.set(x,y,ZB+.08); room.add(b); glow(room,[x,y,ZB+.1],.2); }
-  // полароиды на стене между окнами и у кровати
-  const photoTex=(c1,c2)=>canvasTex(64,76,(x,w,h)=>{ x.fillStyle='#FFFAF2'; x.fillRect(0,0,w,h); const g=x.createLinearGradient(0,6,0,58); g.addColorStop(0,c1); g.addColorStop(1,c2); x.fillStyle=g; x.fillRect(6,6,w-12,52); });
-  [[-.4,1.75,-.08,'#E9A9A6','#F2D06B'],[-.15,1.4,.06,'#A9C3DE','#8E9C82'],[2.05,1.7,.05,'#F2D06B','#E2574C'],[-3.1,1.85,-.05,'#8E9C82','#E9DCC8'],[-2.75,1.55,.08,'#2F55D4','#E9A9A6']].forEach(([x,y,r,a,b])=>{
-    const p=new T.Mesh(new T.PlaneGeometry(.24,.29), new T.MeshStandardMaterial({map:photoTex(a,b), roughness:.9})); p.position.set(x,y,ZB+.012); p.rotation.z=r; room.add(p);
-    const tape=new T.Mesh(new T.PlaneGeometry(.12,.04), new T.MeshBasicMaterial({color:lin('#C9D1B8'), transparent:true, opacity:.8})); tape.position.set(x,y+.15,ZB+.016); tape.rotation.z=r-.1; room.add(tape); });
+  const frameM=M('vinyl','#F7F1E6');
+  const win=new T.Group(); win.position.set(-.05,1.6,ZB+.01); room.add(win);
+  const gl=new T.Mesh(new T.PlaneGeometry(1.5,1.05), glassM); gl.position.z=.005; win.add(gl);
+  box(win,1.66,.08,.08,frameM,[0,.56,.03],null,true); box(win,1.66,.08,.08,frameM,[0,-.56,.03],null,true);
+  box(win,.08,1.2,.08,frameM,[-.79,0,.03],null,true); box(win,.08,1.2,.08,frameM,[.79,0,.03],null,true);
+  box(win,.05,1.05,.05,frameM,[.2,0,.03],null,true); box(win,.4,.05,.05,frameM,[.5,.3,.03],null,true); // форточка
+  box(win,1.85,.07,.2,frameM,[0,-.62,.09]); // подоконник
+  // тюль и шторы
+  const tulle=new T.MeshStandardMaterial({color:lin('#FFFDF8'), roughness:1, transparent:true, opacity:.55});
+  box(win,1.55,1.2,.02,tulle,[0,.02,.13],null,true);
+  const drapeM=plainM('#B9785F',.95);
+  [-1,1].forEach(s=>box(win,.3,1.55,.06,drapeM,[s*1.0,-.08,.15]));
+  box(win,2.4,.05,.06,M('metal','#B89A6A'),[0,.82,.15],null,true); // карниз
+  // батарея под окном
+  const radM=plainM('#EDE6D8',.6);
+  for(let i=0;i<9;i++) box(room,.09,.5,.12,radM,[-.45+i*.1,.48,ZB+.12]);
+  box(room,.95,.04,.06,radM,[-.05,.3,ZB+.12],null,true); box(room,.95,.04,.06,radM,[-.05,.68,ZB+.12],null,true);
 
-  // кровать в левом углу: клетчатый плед, подушки
+  // кровать у левой стены и ковёр на стене над ней
   const bed=new T.Group(); bed.position.set(-3.05,0,-1.05); room.add(bed);
-  box(bed,2.0,.42,1.5,plainM('#B98A5E',.8),[0,.21,0]);
+  box(bed,2.0,.42,1.5,plainM('#7E5638',.7),[0,.21,0]);
+  box(bed,2.0,.75,.1,plainM('#7E5638',.7),[0,.6,-.72]);
   box(bed,1.92,.2,1.42,plainM('#FBF5EC',.95),[0,.52,0]);
-  box(bed,1.3,.08,1.46,plainM('#ffffff',.95,tiled(gingham('#8E9C82'),4,4)),[.3,.64,0]);
-  box(bed,.42,.18,.6,plainM('#E9A9A6',.95),[-.72,.72,-.36],[0,0,.15]);
-  box(bed,.42,.18,.6,plainM('#F2D06B',.95),[-.74,.7,.3],[0,0,.1]);
-  // столик у окна, табурет, цветы, кружка
-  const tbl=new T.Group(); tbl.position.set(-.45,0,-1.45); room.add(tbl);
-  box(tbl,1.1,.06,.62,plainM('#C69A6B',.7),[0,.78,0]); box(tbl,.08,.75,.08,plainM('#9C7450',.8),[0,.38,0]);
+  const plaid=c=>tiled(canvasTex(64,64,(x,w,h)=>{ x.fillStyle='#F4E7D2'; x.fillRect(0,0,w,h); x.fillStyle=c; x.globalAlpha=.5; x.fillRect(0,0,w/2,h); x.fillRect(0,0,w,h/2); x.globalAlpha=.35; x.fillRect(0,0,w/2,h/2); x.globalAlpha=1; }),1,1);
+  box(bed,1.3,.08,1.46,plainM('#ffffff',.95,tiled(plaid('#5F7A9A'),4,4)),[.3,.64,0]);
+  box(bed,.42,.2,.6,plainM('#FBF5EC',.95),[-.7,.72,-.1],[0,0,.15]);
+  const carpet=canvasTex(320,200,(x,w,h)=>{
+    x.fillStyle='#E7D6B8'; x.fillRect(0,0,w,h);           // бахрома
+    x.fillStyle='#A94B45'; x.fillRect(10,6,w-20,h-12);   // поле
+    x.fillStyle='#2F3D66'; x.fillRect(10,6,w-20,22); x.fillRect(10,h-28,w-20,22); x.fillRect(10,6,22,h-12); x.fillRect(w-32,6,22,h-12);
+    x.fillStyle='#E9C27A'; for(let i=0;i<22;i++){ const px=20+i*13.5; x.beginPath(); x.moveTo(px,17); x.lineTo(px+6,11); x.lineTo(px+12,17); x.lineTo(px+6,23); x.fill(); x.beginPath(); x.moveTo(px,h-17); x.lineTo(px+6,h-23); x.lineTo(px+12,h-17); x.lineTo(px+6,h-11); x.fill(); }
+    const dia=(cx,cy,rx,ry,c)=>{ x.fillStyle=c; x.beginPath(); x.moveTo(cx,cy-ry); x.lineTo(cx+rx,cy); x.lineTo(cx,cy+ry); x.lineTo(cx-rx,cy); x.fill(); };
+    dia(w/2,h/2,92,62,'#2F3D66'); dia(w/2,h/2,74,48,'#E7D6B8'); dia(w/2,h/2,54,34,'#A94B45'); dia(w/2,h/2,30,20,'#E9C27A'); dia(w/2,h/2,12,8,'#2F3D66');
+    [[60,52],[w-60,52],[60,h-52],[w-60,h-52]].forEach(([cx,cy])=>{ dia(cx,cy,20,14,'#E9C27A'); dia(cx,cy,9,6,'#2F3D66'); });
+    x.strokeStyle='#E7D6B8'; x.lineWidth=2; for(let i=0;i<w;i+=5){ x.beginPath(); x.moveTo(i,0); x.lineTo(i,6); x.moveTo(i,h-6); x.lineTo(i,h); x.stroke(); } });
+  const rugW=new T.Mesh(new T.PlaneGeometry(2.3,1.45), new T.MeshStandardMaterial({map:carpet, roughness:1})); rugW.position.set(-3.0,1.62,ZB+.015); room.add(rugW);
+
+  // рабочий стол у окна: советская настольная лампа, тетради, кружка, стул
+  const desk=new T.Group(); desk.position.set(1.45,0,-1.45); room.add(desk);
+  const woodM=plainM('#8A5A3A',.45);
+  box(desk,1.5,.06,.7,woodM,[0,.78,0]);
+  box(desk,.5,.75,.66,woodM,[.48,.375,0]);
+  [.18,.42,.64].forEach(y=>{ box(desk,.44,.005,.02,plainM('#5E3C26',.6),[.48,y,.335],null,true); const k=new T.Mesh(G('dknob',()=>new T.SphereGeometry(.025,8,6)),M('metal','#D9B25E')); k.position.set(.48,y+.1,.35); desk.add(k); });
+  box(desk,.05,.75,.62,woodM,[-.7,.375,0]);
+  // лампа: тяжёлое основание, шарнирная стойка, металлический конус
+  const lampM=M('patent','#4F7A62'), lampIn=new T.MeshStandardMaterial({color:lin('#FFF4DC'), emissive:lin('#FFE0A8'), emissiveIntensity:1.6, side:T.DoubleSide});
+  const lamp=new T.Group(); lamp.position.set(-.45,.81,-.12); desk.add(lamp);
+  const lb=new T.Mesh(new T.CylinderGeometry(.12,.14,.05,16),lampM); lb.position.y=.025; lb.castShadow=true; lamp.add(lb);
+  box(lamp,.03,.42,.03,M('metal','#C8C2B4'),[0,.24,0],[0,0,-.25]);
+  box(lamp,.03,.36,.03,M('metal','#C8C2B4'),[.13,.55,0],[0,0,.9]);
+  const shade=new T.Group(); shade.position.set(.3,.6,0); shade.rotation.z=-.9; lamp.add(shade);
+  const sh=new T.Mesh(new T.ConeGeometry(.13,.2,16,1,true),lampM); sh.castShadow=true; shade.add(sh);
+  const shIn=new T.Mesh(new T.ConeGeometry(.125,.19,16,1,true),lampIn); shade.add(shIn);
+  glow(lamp,[.38,.5,0],.55);
+  const lampLight=new T.PointLight(lin('#ffd9a0'),.6,3.2,2); lampLight.position.set(.35,.45,0); lamp.add(lampLight);
+  // тетради, стопка книг, кружка, цветок на подоконнике
+  box(desk,.32,.02,.24,plainM('#B9BEF0',.8),[.05,.82,.05],[0,.2,0]);
+  box(desk,.3,.02,.22,plainM('#9EDDBC',.8),[.08,.84,.04],[0,-.1,0]);
+  [['#E2574C',.06],['#2F55D4',.05],['#F2D06B',.05]].forEach(([c,t],i)=>box(desk,.34,t,.24,plainM(c,.7),[.5,.83+i*.055,-.15],[0,.1*i,0]));
+  const mug=new T.Mesh(new T.CylinderGeometry(.05,.045,.11,12), M('vinyl','#FBF5EC')); mug.position.set(-.15,.865,.18); mug.castShadow=true; desk.add(mug);
   const potM=plainM('#C8714E',.9), leafM=plainM('#7F946F',.85);
   const plant=(parent,p,s)=>{ const g=new T.Group(); g.position.set(...p); g.scale.setScalar(s); parent.add(g);
     const pot=new T.Mesh(G('pot',()=>new T.CylinderGeometry(.11,.08,.18,10)),potM); pot.position.y=.09; pot.castShadow=true; g.add(pot);
     [[0,.3,0,.13],[.08,.24,.05,.1],[-.08,.25,-.03,.1],[.02,.36,-.06,.09]].forEach(([x,y,z,r])=>{ const l=new T.Mesh(G('leaf'+r,()=>new T.IcosahedronGeometry(r,0)),leafM); l.position.set(x,y,z); l.castShadow=true; g.add(l); }); };
-  plant(tbl,[-.36,.81,-.06],1); plant(room,[-2.2,.0,1.7],1.6); plant(room,[2.4,1.17,-1.74],.8);
-  const mug=new T.Mesh(new T.CylinderGeometry(.05,.045,.11,12), M('vinyl','#2F55D4')); mug.position.set(.25,.865,.05); mug.castShadow=true; tbl.add(mug);
-  const stool=new T.Group(); stool.position.set(-.45,0,-.7); room.add(stool);
-  const seat=new T.Mesh(new T.CylinderGeometry(.24,.24,.07,16), M('vinyl','#E2574C')); seat.position.y=.5; seat.castShadow=true; stool.add(seat);
-  [[.13,.13],[-.13,.13],[.13,-.13],[-.13,-.13]].forEach(([x,z])=>box(stool,.04,.48,.04,plainM('#9C7450',.8),[x,.24,z]));
-  // кухонька: шкафчик, плитка, чайник, полка
-  const kit=new T.Group(); kit.position.set(1.55,0,-1.55); room.add(kit);
-  box(kit,1.5,.9,.62,plainM('#E8D6B7',.8),[0,.45,0]); box(kit,1.56,.06,.68,plainM('#C69A6B',.7),[0,.93,0]);
-  [-.37,.37].forEach(x=>{ box(kit,.66,.7,.02,M('vinyl','#8E9C82'),[x,.43,.32]); const k=new T.Mesh(G('knob2',()=>new T.SphereGeometry(.03,8,6)),M('metal','#D9B25E')); k.position.set(x+(x<0?.24:-.24),.6,.35); kit.add(k); });
-  const kettle=new T.Mesh(new T.SphereGeometry(.13,12,10), M('patent','#E2574C')); kettle.scale.set(1,.85,1); kettle.position.set(.35,1.07,-.05); kettle.castShadow=true; kit.add(kettle);
-  box(kit,1.3,.05,.24,plainM('#C69A6B',.7),[0,1.9,-.2]);
-  [['#F2D06B',-.45],['#E9A9A6',-.2],['#A9C3DE',.05]].forEach(([c,x])=>{ const j=new T.Mesh(G('jar',()=>new T.CylinderGeometry(.07,.07,.18,10)),plainM(c,.6)); j.position.set(x,2.02,-.2); j.castShadow=true; kit.add(j); });
-  // коврик
-  const rug=new T.Mesh(new T.CircleGeometry(1,40), plainM('#E9A9A6',.95)); rug.rotation.x=-Math.PI/2; rug.scale.set(1.5,1,1); rug.position.set(.2,.005,.55); rug.receiveShadow=true; room.add(rug);
-  const rugIn=new T.Mesh(new T.RingGeometry(.78,.84,40), plainM('#FBF5EC',.95)); rugIn.rotation.x=-Math.PI/2; rugIn.scale.set(1.5,1,1); rugIn.position.set(.2,.008,.55); room.add(rugIn);
+  plant(room,[-.6,1.015,ZB+.12],.7); plant(room,[2.55,0,1.65],1.5);
+  // стул
+  const chair=new T.Group(); chair.position.set(1.3,0,-.85); room.add(chair);
+  box(chair,.44,.05,.42,woodM,[0,.48,0]);
+  [[.18,.18],[-.18,.18],[.18,-.18],[-.18,-.18]].forEach(([x,z])=>box(chair,.04,.48,.04,woodM,[x,.24,z]));
+  box(chair,.44,.36,.04,woodM,[0,.78,.2]);
+  // полароиды над столом
+  const photoTex=(c1,c2)=>canvasTex(64,76,(x,w,h)=>{ x.fillStyle='#FFFAF2'; x.fillRect(0,0,w,h); const g=x.createLinearGradient(0,6,0,58); g.addColorStop(0,c1); g.addColorStop(1,c2); x.fillStyle=g; x.fillRect(6,6,w-12,52); });
+  [[1.15,1.9,-.08,'#E9A9A6','#F2D06B'],[1.45,1.72,.06,'#A9C3DE','#8E9C82'],[1.78,1.95,.04,'#2F55D4','#E9A9A6']].forEach(([x,y,r,a,b])=>{
+    const p=new T.Mesh(new T.PlaneGeometry(.24,.29), new T.MeshStandardMaterial({map:photoTex(a,b), roughness:.9})); p.position.set(x,y,ZB+.012); p.rotation.z=r; room.add(p);
+    const tape=new T.Mesh(new T.PlaneGeometry(.12,.04), new T.MeshBasicMaterial({color:lin('#C9D1B8'), transparent:true, opacity:.8})); tape.position.set(x,y+.15,ZB+.016); tape.rotation.z=r-.1; room.add(tape); });
+  // палас на полу
+  const runner=canvasTex(128,64,(x,w,h)=>{ x.fillStyle='#8C9A7E'; x.fillRect(0,0,w,h); x.fillStyle='#E7D6B8'; x.fillRect(6,6,w-12,4); x.fillRect(6,h-10,w-12,4); x.fillStyle='#B66A5A'; for(let i=14;i<w-10;i+=18){ x.beginPath(); x.moveTo(i,h/2-9); x.lineTo(i+7,h/2); x.lineTo(i,h/2+9); x.lineTo(i-7,h/2); x.fill(); } });
+  const rug=new T.Mesh(new T.PlaneGeometry(2.6,1.3), new T.MeshStandardMaterial({map:runner, roughness:1})); rug.rotation.x=-Math.PI/2; rug.position.set(-.3,.006,.6); rug.receiveShadow=true; room.add(rug);
 
-  // ШКАФ: здесь герой переодевается
+  // ШКАФ: полированный, с зеркалом на дверце — здесь герой переодевается
   const wr=new T.Group(); wr.position.set(3.35,0,-1.42); room.add(wr);
-  box(wr,1.3,2.3,.82,M('vinyl','#F3EEE7'),[0,1.15,0]);
-  box(wr,1.4,.1,.9,M('vinyl','#E8D6B7'),[0,2.35,0]);
-  const wDoorL=box(wr,.6,2.05,.05,M('patent','#2D3F8C'),[-.31,1.12,.42]);
-  box(wr,.6,2.05,.05,M('patent','#2D3F8C'),[.31,1.12,.42]);
+  const polM=M('patent','#6E4329');
+  box(wr,1.3,2.3,.82,polM,[0,1.15,0]);
+  box(wr,1.4,.1,.9,polM,[0,2.35,0]);
+  box(wr,.6,2.05,.05,polM,[-.31,1.12,.42]);
+  box(wr,.6,2.05,.05,polM,[.31,1.12,.42]);
+  const mirror=new T.Mesh(new T.PlaneGeometry(.44,1.6), new T.MeshStandardMaterial({color:lin('#C9D6E0'), metalness:.6, roughness:.15})); mirror.position.set(.31,1.15,.452); wr.add(mirror);
   [-.06,.06].forEach(x=>{ const k=new T.Mesh(G('wknob',()=>new T.SphereGeometry(.04,10,8)),M('metal','#D9B25E')); k.position.set(x,1.15,.47); wr.add(k); });
+  box(wr,.4,.3,.36,plainM('#C8A27A',.8),[-.2,2.55,0],[0,.1,0]); // коробка на шкафу
   // невидимая «кнопка» на весь фасад шкафа — чтобы попасть кликом
   const wHit=new T.Mesh(new T.BoxGeometry(1.3,2.3,.1), new T.MeshBasicMaterial({visible:false})); wHit.position.set(0,1.15,.45); wr.add(wHit);
   const sign=canvasTex(256,96,(x,w,h)=>{ x.fillStyle='#FBF5EC'; x.fillRect(0,0,w,h); x.strokeStyle='#2E2440'; x.lineWidth=5; x.strokeRect(4,4,w-8,h-8); x.fillStyle='#E2574C'; x.font='700 56px Caveat, cursive'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('шкаф',w/2,h/2+3); });
-  const sg=new T.Mesh(new T.PlaneGeometry(.7,.26), new T.MeshBasicMaterial({map:sign, toneMapped:false})); sg.position.set(0,2.6,.3); sg.rotation.z=.04; wr.add(sg);
-  // вешалка-бирка на дверце
-  box(wr,.14,.2,.02,M('vinyl','#F2D06B'),[.2,1.5,.46],[0,0,.15]);
+  const sg=new T.Mesh(new T.PlaneGeometry(.7,.26), new T.MeshBasicMaterial({map:sign, toneMapped:false})); sg.position.set(-.25,2.95,.3); sg.rotation.z=.04; wr.add(sg);
 
-  // дверь наружу, в левой стене
-  const ex=door(room,'#2F4A3A','на улицу →'); ex.group.position.set(-X+.02,0,1.15); ex.group.rotation.y=Math.PI/2;
-  const warm=new T.PointLight(lin('#ffd6a2'), .55, 7, 2); warm.position.set(0,2.2,-.6); room.add(warm);
+  // дверь во двор, в левой стене
+  const ex=door(room,'#8A5A3A','во двор →'); ex.group.position.set(-X+.02,0,1.15); ex.group.rotation.y=Math.PI/2;
+  const warm=new T.PointLight(lin('#ffd6a2'), .5, 7, 2); warm.position.set(0,2.2,-.6); room.add(warm);
   return {
-    id:'autodom', name:'Автодом', group:room, bg:null, wardrobe:true,
+    id:'home', name:'Квартира', group:room, bg:null, wardrobe:true,
     cam:{pos:[0,6.3,10.8], look:[0,.6,-.05], fov:32},
     light:{pos:[-3.5,8,5.5], color:'#fff1e0', k:1.35},
     bounds:{x0:-3.6,x1:3.7,z0:-.55,z1:1.9},
-    obst:[{x:-3.05,z:-1.05,r:.95},{x:-.45,z:-.7,r:.4},{x:3.35,z:-1.42,r:.82}],
+    obst:[{x:-3.05,z:-1.05,r:.95},{x:1.3,z:-.85,r:.4},{x:1.45,z:-1.45,r:.6},{x:3.35,z:-1.42,r:.82}],
     podium:null,
     portals:[{x:-3.55,z:1.15,r:.5,to:'street',spawn:[.13,.86],yaw:Math.PI/2,mesh:ex.hit},
              {x:3.2,z:-.42,r:.42,action:'wardrobe',mesh:wHit}],
     spawn:[-2.9,1.15], spawnYaw:Math.PI/2,
-    hint:'это твой автодом · подойди к шкафу, чтобы переодеться · дверь — на улицу'
+    hint:'твоя квартира · подойди к шкафу, чтобы переодеться · дверь — во двор'
   };
 })();
 
@@ -684,11 +725,11 @@ LOCS.street = flatLoc({
   horizonV:-1.4, fov:14, ref:{v:.6,h:.105}, speed:4.5,
   walk:[[.1,.5],[.92,.5],[.985,.97],[.015,.97],[.015,.63],[.1,.63]],
   portals:[
-    {u:.1,v:.88,label:'← в автодом',to:'autodom',spawn:[-2.9,1.15],yaw:Math.PI/2},
+    {u:.1,v:.88,label:'← домой',to:'home',spawn:[-2.9,1.15],yaw:Math.PI/2},
     {u:.33,v:.505,label:'двор',locked:'Двор откроется позже'}
   ],
   spawn:[.7,.6], light:{dir:[-.5,1,.6],color:'#ffe6c8',k:1.7},
-  hint:'тестовая улица: проверяем, как ходит Хромчик · автодом слева внизу'
+  hint:'тестовая улица: проверяем, как ходит Хромчик · дом слева внизу'
 });
 const HC=1.95;
 function calib(l){
@@ -711,14 +752,14 @@ function nearestOnPoly([x,y],P){ const A=loc.iw/loc.ih; let best=null,bd=1e9;
   const cx=P.reduce((a,p)=>a+p[0],0)/P.length, cy=P.reduce((a,p)=>a+p[1],0)/P.length;
   return [best[0]+(cx-best[0])*.04, best[1]+(cy-best[1])*.04];
 }
-let loc = LOCS.autodom;
+let loc = LOCS.home;
 
 /* ---------- персонаж ---------- */
 const world = new T.Group(); scene.add(world); world.position.set(0,0,.9);
 let char = null;
 
 /* ---------- state ---------- */
-let state = {loc:'autodom', hero:null, outfit:null, skin:0, eye:0, hc:0, name:'Кнопка'};
+let state = {loc:'home', hero:null, outfit:null, skin:0, eye:0, hc:0, name:'Кнопка'};
 let diary = [];
 let mode = 'city';
 
@@ -1404,7 +1445,7 @@ function start(data){
   load();
   if(data&&data.state){ state=data.state; diary=data.diary||diary; contourIdx=data.contourIdx||0; }
   resize(); camTargets(); camPos.copy(wantPos); camLook.copy(wantLook); camera.fov=wantFov;
-  rebuild(); renderDiary(); setMode('city'); setLocation(LOCS[state.loc]?state.loc:'autodom');
+  rebuild(); renderDiary(); setMode('city'); setLocation(LOCS[state.loc]?state.loc:'home');
   if(!state.hero) showStart();
   requestAnimationFrame(t=>{ last=t; frame(t); });
 }
