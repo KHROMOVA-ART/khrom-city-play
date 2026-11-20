@@ -189,6 +189,76 @@ button{font:inherit;color:inherit;cursor:pointer}
 .lightbox .row{justify-content:center}
 .lightbox p{margin:0;color:var(--surface);font-size:12.5px;text-align:center}
 
+/* загрузка: чашка кофе «кипит» маркерной линией, по полоске загрузки идёт голубь */
+.boot{position:fixed;inset:0;z-index:40;background:var(--dotted),var(--page);display:grid;place-items:center;transition:opacity .45s ease,visibility .45s}
+.boot.out{opacity:0;visibility:hidden}
+.boot-in{display:grid;justify-items:center;gap:14px;width:min(420px,88vw)}
+.boot-cup{width:min(210px,52vw);height:auto;overflow:visible}
+.boot-cup .steam path{fill:none;stroke:var(--ink);stroke-width:4;stroke-linecap:round;stroke-dasharray:60 200;animation:steam 1.8s ease-in-out infinite;opacity:0}
+.boot-cup .steam path:nth-child(2){animation-delay:.45s}.boot-cup .steam path:nth-child(3){animation-delay:.9s}
+@keyframes steam{0%{stroke-dashoffset:60;opacity:0;transform:translateY(8px)}35%{opacity:1}100%{stroke-dashoffset:-140;opacity:0;transform:translateY(-14px)}}
+.boot-cup .pop{transform-origin:105px 150px;animation:cupPop .5s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes cupPop{from{transform:scale(.6) rotate(-8deg)}to{transform:none}}
+.boot-track{position:relative;width:100%;height:46px;margin-top:6px}
+.boot-line{position:absolute;left:0;right:0;bottom:6px;height:12px;background:rgba(158,221,188,.7);transform:rotate(-1deg);border-radius:2px}
+.boot-fill{position:absolute;left:0;bottom:6px;height:12px;width:0;background:var(--marker);opacity:.85;transform:rotate(-1deg);border-radius:2px;clip-path:polygon(0 18%,100% 0,98% 100%,0 86%)}
+.boot-pigeon{position:absolute;bottom:14px;left:0;width:46px;height:auto;margin-left:-23px;overflow:visible}
+.boot-pigeon .head{transform-origin:31px 20px;animation:peck .5s steps(2) infinite}
+.boot-pigeon .body{animation:waddle .5s ease-in-out infinite alternate}
+@keyframes peck{0%{transform:translate(0,0)}100%{transform:translate(3px,1px)}}
+@keyframes waddle{from{transform:rotate(-3deg)}to{transform:rotate(3deg) translateY(-1px)}}
+.boot-say{font-family:var(--hand);font-size:28px;font-weight:700;line-height:1;min-height:30px;color:var(--ink)}
+.boot-pct{font-family:var(--pixel);font-size:12px;color:var(--muted)}
+
+/* главное меню: картинка двора, тополиный пух, карточка-стикер с кнопками */
+.menu{position:fixed;inset:0;z-index:30;overflow:hidden;background:#2E2440}
+.menu-bg{position:absolute;inset:-3%;background:url(bg/menu.jpg) center/cover no-repeat;animation:kenburns 26s ease-in-out infinite alternate;transform-origin:65% 60%}
+@keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.07) translate(-1.2%,-1%)}}
+.menu::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(46,36,64,.38),rgba(46,36,64,0) 55%);pointer-events:none}
+.fluff{position:absolute;inset:0;pointer-events:none;z-index:1}
+.fluff i{position:absolute;top:-4%;width:var(--s);height:var(--s);border-radius:50%;background:rgba(255,253,248,.9);box-shadow:0 0 6px rgba(255,253,248,.8);filter:blur(.3px);animation:fluff var(--d) linear infinite;animation-delay:var(--dl);left:var(--x)}
+@keyframes fluff{0%{transform:translate(0,0)}25%{transform:translate(4vw,28vh)}50%{transform:translate(-2vw,55vh)}75%{transform:translate(6vw,80vh)}100%{transform:translate(2vw,108vh)}}
+.menu-card{position:absolute;z-index:2;left:clamp(16px,7vw,110px);top:50%;transform:translateY(-50%) rotate(-1.5deg);width:min(340px,calc(100vw - 32px));background:var(--surface);border:var(--b);border-radius:18px;padding:30px 26px 24px;box-shadow:0 6px 0 var(--ink);display:grid;gap:18px;animation:cardIn .6s cubic-bezier(.3,1.4,.5,1) both}
+.menu-card::before{content:"";position:absolute;top:-12px;left:50%;width:84px;height:22px;transform:translateX(-50%) rotate(3deg);background:rgba(249,208,220,.85)}
+@keyframes cardIn{from{opacity:0;transform:translateY(-40%) rotate(-6deg)}to{opacity:1;transform:translateY(-50%) rotate(-1.5deg)}}
+.menu-logo{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,46px);line-height:.95;letter-spacing:-.01em;margin:0}
+.menu-logo span{display:inline-block;background:var(--ink);color:var(--surface);padding:2px 12px 6px;border-radius:12px;transform:rotate(-3deg);margin-top:6px;box-shadow:0 4px 0 var(--lav-2)}
+.menu-tag{margin:-6px 0 0;font-family:var(--hand);font-size:24px;font-weight:700;line-height:1.05;color:var(--marker)}
+.menu-btns{display:grid;gap:10px}
+.mbtn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:var(--b);border-radius:999px;padding:12px 18px 12px 22px;background:var(--surface);font-weight:800;font-size:16px;box-shadow:var(--sh);transition:transform .12s,box-shadow .12s}
+.mbtn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
+.mbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.mbtn.primary{background:var(--ink);color:var(--surface);font-family:var(--display);font-size:20px;letter-spacing:.04em;padding:14px 18px 14px 24px}
+.mbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.mbtn:focus-visible{outline:3px solid var(--marker);outline-offset:3px}
+.menu-ver{position:absolute;z-index:2;right:16px;bottom:12px;font-family:var(--pixel);font-size:12px;color:var(--surface);background:rgba(46,36,64,.55);padding:3px 10px;border-radius:999px}
+.mwin-back{position:absolute;inset:0;z-index:5;background:rgba(46,36,64,.45);display:grid;place-items:center;padding:16px}
+.mwin{width:min(400px,100%);background:var(--surface);border:var(--b);border-radius:18px;box-shadow:0 6px 0 var(--ink);overflow:hidden;animation:cardIn2 .35s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes cardIn2{from{opacity:0;transform:scale(.9) rotate(-3deg)}to{opacity:1;transform:none}}
+.mwin-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px 10px 18px;background:var(--lav);border-bottom:var(--b)}
+.mwin-head b{font-family:var(--display);font-weight:600;font-size:17px}
+.mwin-x{width:34px;height:34px;border-radius:50%;border:var(--b);background:var(--surface);display:grid;place-items:center;padding:0;box-shadow:var(--sh-s);font-size:18px;line-height:1}
+.mwin-body{padding:18px;display:grid;gap:16px}
+.mrow{display:grid;gap:8px}
+.mrow>span{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mseg{display:flex;gap:6px;flex-wrap:wrap}
+.mseg button{border:var(--b);border-radius:999px;background:var(--surface);padding:7px 14px;font-weight:800;font-size:13px;box-shadow:var(--sh-s)}
+.mseg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.mseg button:disabled{opacity:.5;cursor:default}
+.mwin-bye{padding:26px 22px 22px;text-align:center;display:grid;gap:12px;justify-items:center}
+.mwin-bye b{font-family:var(--hand);font-size:40px;line-height:1}
+.mwin-bye p{margin:0;color:var(--muted);font-size:15px;line-height:1.4;max-width:30ch}
+@media (max-width:640px){
+  .menu-card{left:50%;top:auto;bottom:24px;transform:translateX(-50%) rotate(-1.5deg);animation:none}
+  .menu::after{background:linear-gradient(0deg,rgba(46,36,64,.45),rgba(46,36,64,0) 60%)}
+  .menu-bg{background-position:58% center}
+  .menu-ver{top:12px;bottom:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  .menu-bg,.fluff i,.boot-pigeon .head,.boot-pigeon .body,.menu-card,.mwin{animation:none}
+  .boot-cup .steam path{animation:none;opacity:.6}
+}
+
 /* первый экран: выбор героя → интро-ролик */
 .start{position:fixed;inset:0;z-index:20;background:var(--dotted),var(--page);display:grid;place-items:center;padding:24px 16px;overflow:auto}
 .start .step{display:grid;justify-items:center;gap:18px;max-width:640px;width:100%;text-align:center}
@@ -256,7 +326,7 @@ button{font:inherit;color:inherit;cursor:pointer}
               <li><button data-go="street"><i></i>Улица<small>тест</small></button></li>
               <li><button disabled><i></i>Карта остановок<small>скоро</small></button></li>
             </ol>
-            <button class="restart" id="restart">↺ первый экран</button>
+            <button class="restart" id="restart">↺ главное меню</button>
           </div>
         </div>
       </div>
@@ -341,6 +411,68 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div class="diary" id="diary"></div>
     </div>
   </aside>
+</div>
+
+<div class="boot" id="boot" role="status" aria-live="polite">
+  <div class="boot-in">
+    <svg class="boot-cup" viewBox="0 0 210 190" aria-hidden="true">
+      <defs>
+        <filter id="boil" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence id="boilNoise" type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+        <clipPath id="cupIn"><path d="M44 72 L160 72 L150 150 Q148 160 136 160 L68 160 Q56 160 54 150 Z"/></clipPath>
+      </defs>
+      <g class="pop" filter="url(#boil)">
+        <g class="steam"><path d="M82 60 q-10 -14 0 -26 q10 -12 0 -26"/><path d="M104 60 q-10 -14 0 -26 q10 -12 0 -26"/><path d="M126 60 q-10 -14 0 -26 q10 -12 0 -26"/></g>
+        <ellipse cx="102" cy="168" rx="86" ry="14" fill="#D6D8F6" stroke="#2E2440" stroke-width="4"/>
+        <path d="M160 88 q34 -2 32 26 q-2 26 -40 26" fill="none" stroke="#2E2440" stroke-width="5" stroke-linecap="round"/>
+        <path d="M44 72 L160 72 L150 150 Q148 160 136 160 L68 160 Q56 160 54 150 Z" fill="#FFFDF8"/>
+        <g clip-path="url(#cupIn)"><rect id="bootCoffee" x="30" y="160" width="150" height="100" fill="#B98A5E"/><rect id="bootFoam" x="30" y="156" width="150" height="8" fill="#F4E7D2"/></g>
+        <path d="M44 72 L160 72 L150 150 Q148 160 136 160 L68 160 Q56 160 54 150 Z" fill="none" stroke="#2E2440" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M70 110 q6 6 12 0 M120 110 q6 6 12 0" fill="none" stroke="#2E2440" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="74" cy="122" rx="7" ry="4" fill="#F9D0DC"/><ellipse cx="130" cy="122" rx="7" ry="4" fill="#F9D0DC"/>
+        <path d="M96 124 q6 5 12 0" fill="none" stroke="#2E2440" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <div class="boot-track">
+      <div class="boot-line"></div><div class="boot-fill" id="bootFill"></div>
+      <svg class="boot-pigeon" id="bootPigeon" viewBox="0 0 50 40" aria-hidden="true"><g stroke="#2E2440" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 32 l-1 6 M24 32 l1 6" fill="none"/>
+        <g class="body"><path d="M4 22 Q8 12 22 14 Q34 16 33 26 Q30 33 18 32 Q8 31 4 22 Z" fill="#B9BEF0"/><path d="M12 20 Q20 16 27 22" fill="none"/></g>
+        <g class="head"><circle cx="34" cy="13" r="7" fill="#9AA0D8"/><path d="M41 13 l5 1.5 l-5 1.5" fill="#F7D774"/><circle cx="36" cy="11.5" r="1.3" fill="#2E2440" stroke="none"/><path d="M29 18 q4 3 8 1" fill="none" stroke="#9EDDBC" stroke-width="3"/></g>
+      </g></svg>
+    </div>
+    <div class="boot-say" id="bootSay">варим кофе…</div>
+    <div class="boot-pct" id="bootPct">0%</div>
+  </div>
+</div>
+
+<div class="menu" id="menu" hidden>
+  <div class="menu-bg" role="img" aria-label="Старый двор: пятиэтажки, качели, голуби и кафе с полосатым навесом"></div>
+  <div class="fluff" id="fluff" aria-hidden="true"></div>
+  <div class="menu-card">
+    <h1 class="menu-logo">KHROM<br><span>City</span></h1>
+    <p class="menu-tag">уютная игра про дорогу к мечте</p>
+    <nav class="menu-btns" aria-label="Главное меню">
+      <button class="mbtn primary" id="mStart">START <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <button class="mbtn" id="mSettings">Настройки <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button>
+      <button class="mbtn" id="mExit">Выйти <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/></svg></button>
+    </nav>
+  </div>
+  <div class="menu-ver">прототип · 20.11</div>
+  <div class="mwin-back" id="mSetWin" hidden>
+    <div class="mwin" role="dialog" aria-modal="true" aria-labelledby="mSetTitle">
+      <div class="mwin-head"><b id="mSetTitle">Настройки</b><button class="mwin-x" data-close aria-label="Закрыть">×</button></div>
+      <div class="mwin-body">
+        <div class="mrow"><span>Контур фигурок</span><div class="mseg" id="mContour"></div></div>
+        <div class="mrow"><span>Звук</span><div class="mseg"><button disabled>скоро</button></div></div>
+        <div class="mrow"><span>Прогресс</span><div class="mseg"><button id="mReset">Начать заново: выбрать героя</button></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="mwin-back" id="mByeWin" hidden>
+    <div class="mwin" role="dialog" aria-modal="true" aria-labelledby="mByeTitle">
+      <div class="mwin-bye"><b id="mByeTitle">Пока-пока!</b><p>До встречи во дворе. Можно закрыть вкладку — Кнопка подождёт.</p><button class="mbtn primary" data-close style="width:auto">Остаться</button></div>
+    </div>
+  </div>
 </div>
 
 <div class="start" id="start" hidden>
@@ -1430,7 +1562,44 @@ startEl.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{
   $('introSkip').focus();
 });
 $('introSkip').onclick=finishIntro;
-$('restart').onclick=()=>{ metroMenu.hidden=true; stBtn.setAttribute('aria-expanded',false); state.hero=null; save(); showStart(); };
+$('restart').onclick=()=>{ metroMenu.hidden=true; stBtn.setAttribute('aria-expanded',false); showMenu(); };
+
+/* ---------- загрузка → главное меню ----------
+   Загрузка ждёт модель Хромчика, картинку меню и шрифты (но не меньше ~2 с, чтобы анимацию было видно).
+   Чашка «кипит» тем же дрожанием 8 раз в секунду, что и маркерный контур фигурок. */
+const bootEl=$('boot'), menuEl=$('menu');
+const BOOT_SAY=['варим кофе…','считаем голубей…','развешиваем бельё…','ищем вторую варежку…','сдуваем пыль с карты…','качаемся на качелях…'];
+function bootThenMenu(){
+  const t0=performance.now(), MIN=2200; let shown=0, sayI=0, lastSay=t0, lastBoil=0;
+  const img=new Image(); let imgOk=false; img.onload=img.onerror=()=>imgOk=true; img.src='bg/menu.jpg';
+  let fontsOk=!document.fonts; if(document.fonts) document.fonts.ready.then(()=>fontsOk=true);
+  const noise=$('boilNoise'), coffee=$('bootCoffee'), foam=$('bootFoam'), fill=$('bootFill'), pig=$('bootPigeon');
+  const tick=t=>{
+    const ready=(MODEL.scene||MODEL.failed) && imgOk && fontsOk;
+    const target=ready ? Math.min(1,(t-t0)/MIN) : Math.min(.9,(t-t0)/(MIN*1.6));
+    shown+=(target-shown)*.12; if(ready && target>=1 && shown>.985) shown=1;
+    const y=160-shown*80; coffee.setAttribute('y',y); foam.setAttribute('y',y-4);
+    fill.style.width=(shown*100)+'%'; pig.style.left=(shown*100)+'%';
+    $('bootPct').textContent=Math.round(shown*100)+'%';
+    if(t-lastSay>900){ lastSay=t; sayI=(sayI+1)%BOOT_SAY.length; $('bootSay').textContent=BOOT_SAY[sayI]; }
+    if(!reduce && t-lastBoil>125){ lastBoil=t; noise.setAttribute('seed',1+Math.floor(Math.random()*40)); }
+    if(shown<1) return requestAnimationFrame(tick);
+    $('bootSay').textContent='готово!'; setTimeout(()=>{ bootEl.classList.add('out'); showMenu(); },350);
+  };
+  requestAnimationFrame(tick);
+}
+function showMenu(){ startEl.hidden=true; menuEl.hidden=false; $('mStart').focus(); }
+// тополиный пух — летний московский двор
+(()=>{ const f=$('fluff'); for(let i=0;i<26;i++){ const s=document.createElement('i'); const sz=3+Math.random()*6;
+  s.style.cssText=`--s:${sz}px;--x:${Math.random()*100}%;--d:${14+Math.random()*16}s;--dl:${-Math.random()*30}s;opacity:${.5+Math.random()*.5}`; f.appendChild(s); } })();
+$('mStart').onclick=()=>{ menuEl.hidden=true; if(!state.hero) showStart(); else toast('С возвращением, '+(state.name||'Кнопка')+'!'); };
+function renderMenuContour(){ $('mContour').innerHTML=CONTOURS.map((c,i)=>`<button data-i="${i}" aria-pressed="${i===contourIdx}">${c.name}</button>`).join(''); }
+$('mContour').onclick=e=>{ const b=e.target.closest('[data-i]'); if(!b) return; contourIdx=+b.dataset.i; applyContour(); save(); renderMenuContour(); };
+$('mSettings').onclick=()=>{ renderMenuContour(); $('mSetWin').hidden=false; $('mSetWin').querySelector('[data-close]').focus(); };
+$('mReset').onclick=()=>{ state.hero=null; state.outfit=null; save(); $('mSetWin').hidden=true; toast('Начнём заново: после START выбери героя'); $('mStart').focus(); };
+$('mExit').onclick=()=>{ $('mByeWin').hidden=false; $('mByeWin').querySelector('[data-close]').focus(); };
+menuEl.querySelectorAll('.mwin-back').forEach(w=>{ w.addEventListener('click',e=>{ if(e.target===w||e.target.closest('[data-close]')){ w.hidden=true; $('mStart').focus(); } }); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') menuEl.querySelectorAll('.mwin-back').forEach(w=>{ if(!w.hidden){ w.hidden=true; $('mStart').focus(); } }); });
 
 /* ---------- persistence (per viewer) ---------- */
 function save(){ try{ localStorage.setItem('khrom-city-v1', JSON.stringify({state, contourIdx})); localStorage.setItem('khrom-city-diary', JSON.stringify(diary)); }catch(e){} }
@@ -1446,7 +1615,7 @@ function start(data){
   if(data&&data.state){ state=data.state; diary=data.diary||diary; contourIdx=data.contourIdx||0; }
   resize(); camTargets(); camPos.copy(wantPos); camLook.copy(wantLook); camera.fov=wantFov;
   rebuild(); renderDiary(); setMode('city'); setLocation(LOCS[state.loc]?state.loc:'home');
-  if(!state.hero) showStart();
+  bootThenMenu();
   requestAnimationFrame(t=>{ last=t; frame(t); });
 }
 if(window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(()=>({state, diary, contourIdx}));
