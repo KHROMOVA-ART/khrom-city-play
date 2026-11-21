@@ -839,7 +839,7 @@ LOCS.home = (function buildHome(){
     portals:[{x:-3.55,z:1.15,r:.5,to:'street',spawn:[.13,.86],yaw:Math.PI/2,mesh:ex.hit},
              {x:3.2,z:-.42,r:.42,action:'wardrobe',mesh:wHit}],
     spawn:[-2.9,1.15], spawnYaw:Math.PI/2,
-    hint:'твоя квартира · подойди к шкафу, чтобы переодеться · дверь — во двор'
+    hint:'твоя квартира · ходи стрелками или WASD · шкаф — переодеться · дверь — во двор'
   };
 })();
 
@@ -861,7 +861,7 @@ LOCS.street = flatLoc({
     {u:.33,v:.505,label:'двор',locked:'Двор откроется позже'}
   ],
   spawn:[.7,.6], light:{dir:[-.5,1,.6],color:'#ffe6c8',k:1.7},
-  hint:'тестовая улица: проверяем, как ходит Хромчик · дом слева внизу'
+  hint:'тестовая улица · ходи стрелками или WASD · дом слева внизу'
 });
 const HC=1.95;
 function calib(l){
@@ -910,6 +910,39 @@ if(T.GLTFLoader){
       let n=0; g.scene.traverse(o=>{ if(o.isMesh){ const q=o.geometry; n+=(q.index?q.index.count:q.attributes.position.count)/3; } }); MODEL.tris=Math.round(n); rebuild(); }, fail); }).catch(fail);
 }
 else MODEL.failed=true;
+/* Вещи-модели (Hunyuan → tools/fit_cloth.py): сетка со своими весами на тех же 16 костях, что и манекен.
+   В игре такую вещь гнёт скелет самой фигурки, поэтому рукава ходят вместе с руками. */
+const CLOTH={hoodie_fox:{src:'models/hoodie_fox.json'}};
+function loadCloth(key){
+  const c=CLOTH[key]; if(c.loading||c.scene||!T.GLTFLoader) return; c.loading=true;
+  fetch(c.src).then(r=>r.json()).then(j=>{ const bin=atob(j.glb), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+    new T.GLTFLoader().parse(u.buffer,'', g=>{ c.scene=g.scene; if(char) dress(char,outfitNow()); others.forEach(o=>{ if(o.fig) dress(o.fig,o.outfit); }); applyContour(); }, ()=>c.failed=true); })
+    .catch(()=>c.failed=true);
+}
+// у вещи и у тела кости могут идти в разном порядке — переписываем номера костей в порядок скелета тела (один раз)
+function clothGeo(c,body){
+  if(c.geo) return c.geo;
+  let sm=null; c.scene.traverse(o=>{ if(o.isSkinnedMesh&&!sm) sm=o; }); if(!sm) return null;
+  const order=body.skeleton.bones.map(b=>b.name), map=sm.skeleton.bones.map(b=>order.indexOf(b.name));
+  const geo=sm.geometry.clone(), si=geo.attributes.skinIndex;
+  for(let i=0;i<si.array.length;i++){ const m=map[si.array[i]]; si.array[i]=m<0?0:m; }
+  si.needsUpdate=true;
+  const mat=sm.material.clone(); mat.flatShading=true; mat.side=T.DoubleSide; mat.roughness=.85; mat.metalness=0; mat.envMapIntensity=.6; mat.needsUpdate=true;
+  c.geo=geo; c.mat=mat; return geo;
+}
+// контур вещи на скелете: тот же шейдер со скиннингом, но оболочка ближе к ткани, как у остальных вещей
+const outlineMatCloth=outlineMat.clone(); outlineMatCloth.skinning=true;
+outlineMatCloth.uniforms={uColor:outlineMat.uniforms.uColor, uWidth:outlineMat.uniforms.uWidth, uTime:outlineMat.uniforms.uTime, uPush:{value:.035}};
+function attachSkinned(fig,it){
+  const c=CLOTH[it.glb]; if(!c) return; if(!c.scene){ loadCloth(it.glb); return; }
+  const body=fig.skinMeshes.find(m=>m.isSkinnedMesh); if(!body) return;
+  const geo=clothGeo(c,body); if(!geo) return;
+  const m=new T.SkinnedMesh(geo,c.mat); m.castShadow=true; m.frustumCulled=false;
+  m.position.copy(body.position); m.quaternion.copy(body.quaternion); m.scale.copy(body.scale);
+  body.parent.add(m); m.bind(body.skeleton,body.bindMatrix);
+  const h=new T.SkinnedMesh(geo,outlineMatCloth); h.bind(body.skeleton,body.bindMatrix); h.frustumCulled=false; h.userData.hull=true; m.add(h);
+  fig.clothes.push(m);
+}
 // какая кость за что отвечает. armL/legL — левые на экране, это правая сторона самой фигурки
 const RIG_MAP={armL:'upperarmR',armR:'upperarmL',legL:'thighR',legR:'thighL',shinL:'shinR',shinR:'shinL',head:'head',torso:'chest'};
 const ARM_DOWN=1.257; // модель сделана в T-позе, руки опускаем на 72°
@@ -1008,7 +1041,8 @@ function update(dt){
   if(!char) return;
   const p=world.position;
   walking=false;
-  if(target && mode==='city'){
+  if(kbMove(dt,p)){ /* шаг с клавиатуры уже сделан */ }
+  else if(target && mode==='city'){
     const dx=target.x-p.x, dz=target.z-p.z, d=Math.hypot(dx,dz);
     if(d>.04){ const st=Math.min(d,(loc.speed||1.9)*dt); p.x+=dx/d*st; p.z+=dz/d*st; yawTarget=Math.atan2(dx,dz); walking=true; }
     else { target=null; arrived(p); }
@@ -1072,6 +1106,50 @@ canvas.addEventListener('pointerup',e=>{
   }
   down=null;
 });
+
+/* ---------- клавиатура: стрелки и WASD ----------
+   Ходим относительно камеры: «вверх» — от зрителя вглубь сцены. e.code — физическая клавиша,
+   поэтому WASD работает и на русской раскладке (ЦФЫВ). В гардеробе ←/→ крутят фигурку. */
+const KEYS={ArrowUp:'u',KeyW:'u',ArrowDown:'d',KeyS:'d',ArrowLeft:'l',KeyA:'l',ArrowRight:'r',KeyD:'r'};
+const held=new Set(); let kbWasIn=null, kbNetT=0;
+function kbBlocked(){ const a=document.activeElement;
+  return (a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.isContentEditable)) || !startEl.hidden || !menuEl.hidden || !bootEl.classList.contains('out'); }
+addEventListener('keydown',e=>{ const k=KEYS[e.code]; if(!k||e.metaKey||e.ctrlKey||e.altKey||kbBlocked()) return;
+  e.preventDefault(); held.add(k); if(mode==='city'){ target=null; pending=null; document.getElementById('hint').style.opacity=0; } });
+addEventListener('keyup',e=>{ const k=KEYS[e.code]; if(k) held.delete(k); });
+addEventListener('blur',()=>held.clear());
+const kbF=new T.Vector3(), kbR=new T.Vector3(), kbUp=new T.Vector3(0,1,0), kbN=new T.Vector3();
+function imgFromWorld(w){ const c=contain(); kbN.copy(w).project(camera); return cssToImg((kbN.x+1)/2*c.W,(1-kbN.y)/2*c.H); }
+function kbOk(x,z){
+  if(loc.type==='2d'){ const uv=imgFromWorld(kbN.set(x,0,z)); return inPoly(uv,loc.walk); }
+  const b=loc.bounds; if(x<b.x0||x>b.x1||z<b.z0||z>b.z1) return false;
+  return !loc.obst.some(o=>Math.hypot(x-o.x,z-o.z)<o.r);
+}
+function kbPortal(p){
+  if(loc.type==='2d'){ const [u,v]=imgFromWorld(p), A=loc.iw/loc.ih; return loc.portals.find(q=>Math.hypot((u-q.u)*A,v-q.v)<(q.r||.07))||null; }
+  return loc.portals.find(q=>Math.hypot(p.x-q.x,p.z-q.z)<q.r)||null;
+}
+function kbMove(dt,p){
+  if(mode==='wardrobe'){ if(held.has('l')) wardYaw-=dt*2.6; if(held.has('r')) wardYaw+=dt*2.6; return false; }
+  if(mode!=='city'||!held.size||busy) { if(!held.size&&kbWasIn!==null){ kbWasIn=null; if(netRoom){ const [x,y]=toNet(p); netRoom.send('move',{x,y}); } } return false; }
+  const ix=(held.has('r')?1:0)-(held.has('l')?1:0), iy=(held.has('u')?1:0)-(held.has('d')?1:0);
+  if(!ix&&!iy) return false;
+  camera.getWorldDirection(kbF); kbF.y=0; kbF.normalize(); kbR.crossVectors(kbF,kbUp).normalize();
+  const dx=kbR.x*ix+kbF.x*iy, dz=kbR.z*ix+kbF.z*iy, d=Math.hypot(dx,dz)||1, st=(loc.speed||1.9)*dt;
+  if(kbWasIn===null) kbWasIn=kbPortal(p)||false; // уже стоим у двери/шкафа — не срабатывать сразу
+  const nx=p.x+dx/d*st, nz=p.z+dz/d*st;
+  // упёрлись — скользим вдоль стенки по одной оси
+  if(kbOk(nx,nz)){ p.x=nx; p.z=nz; } else if(kbOk(nx,p.z)){ p.x=nx; } else if(kbOk(p.x,nz)){ p.z=nz; }
+  yawTarget=Math.atan2(dx,dz); walking=true;
+  // дверь или шкаф: срабатывает, когда в него зашли (а не когда уже стоим внутри)
+  const pt=kbPortal(p), was=kbWasIn; kbWasIn=pt||false;
+  if(pt&&pt!==was){ held.clear();
+    if(loc.type==='2d'){ if(pt.locked) toast(pt.locked); else travel(pt.to,pt.spawn,pt.yaw); }
+    else arrived(p); }
+  // другие игроки видят нас: шлём точку чуть впереди
+  kbNetT-=dt; if(netRoom&&kbNetT<=0){ kbNetT=.15; const [x,y]=toNet(kbN.set(p.x+dx/d*.4,0,p.z+dz/d*.4)); netRoom.send('move',{x,y}); }
+  return true;
+}
 
 /* ---------- emotes + stickers ---------- */
 const STICKER = {
@@ -1276,7 +1354,7 @@ const WARD_CATS=[
 ];
 const ITEMS=[
   ['hair','none','без причёски'],['hair','bob','каре','bob','#6B4A36'],['hair','bob-pink','розовое каре','bob','#F2A9BE'],['hair','short','короткая','short','#2E2440'],['hair','bun','пучок','bun','#C8714E'],['hair','pigtails','хвостики','pigtails','#F2D06B',null,{isNew:1}],['hair','long','длинные','long','#3E3029'],
-  ['top','none','майка'],['top','tee','футболка','tee','#FFFDF8'],['top','tee-heart','футболка с сердцем','tee','#FFFDF8','#E2574C',{pat:'heart'}],['top','stripes','свитер в полоску','sweater','#B9BEF0','#FFFDF8',{pat:'stripes'}],['top','gingham','рубашка в клетку','sweater','#C6EED8','#4FA77F',{pat:'gingham'}],['top','hoodie-fox','худи-лиса','hoodie','#E59A5B',null,{ears:'fox'}],['top','hoodie-bunny','худи-зайка','hoodie','#F9D0DC','#F2A9BE',{ears:'bunny',isNew:1}],['top','puffer','пуховик','puffer','#8E9C82','#6F7D64'],
+  ['top','none','майка'],['top','tee','футболка','tee','#FFFDF8'],['top','tee-heart','футболка с сердцем','tee','#FFFDF8','#E2574C',{pat:'heart'}],['top','stripes','свитер в полоску','sweater','#B9BEF0','#FFFDF8',{pat:'stripes'}],['top','gingham','рубашка в клетку','sweater','#C6EED8','#4FA77F',{pat:'gingham'}],['top','hoodie-fox','худи-лиса','glb','#E59A5B',null,{ears:'fox',glb:'hoodie_fox',hideHair:1,thumbKind:'hoodie',isNew:1}],['top','hoodie-bunny','худи-зайка','hoodie','#F9D0DC','#F2A9BE',{ears:'bunny',isNew:1}],['top','puffer','пуховик','puffer','#8E9C82','#6F7D64'],
   ['bottom','none','без низа'],['bottom','shorts','шорты','shorts','#7E9CC8'],['bottom','wide','лаковые брюки','wide','#2E2440',null,{rough:.25}],['bottom','skirt','юбка в клетку','skirt','#F2A9BE','#FFFDF8',{pat:'gingham'}],['bottom','jeans','джинсы клёш','wide','#5C7CB0'],['bottom','cargo','карго','pants','#8E9C82'],
   ['shoes','none','босиком'],['shoes','sneakers','кеды','sneakers','#FFFDF8','#E2574C'],['shoes','sneakers-pink','розовые кеды','sneakers','#F9D0DC','#FFFDF8'],['shoes','boots','ботинки','boots','#6B4A36','#2E2440'],
   ['hat','none','без шапки'],['hat','cap','кепка','cap','#2F55D4'],['hat','beanie','шапка с помпоном','beanie','#E2574C','#FFFDF8'],['hat','bucket','панама','bucket','#F7D774'],['hat','bunny','ушки','bunny','#FFFDF8','#F2A9BE',{isNew:1}],
@@ -1332,7 +1410,11 @@ function attachPart(fig,p){
 function dress(fig,o){
   if(!fig) return; (fig.clothes||[]).forEach(m=>m.parent&&m.parent.remove(m)); fig.clothes=[];
   o=o||{};
-  for(const c of WARD_CATS){ let it=ITEM_BY_ID[c.id+':'+o[c.id]]; if(!it||it.kind==='none'||!BUILD[it.kind]) continue; it=hairItem(it,o); BUILD[it.kind](it).forEach(p=>attachPart(fig,p)); }
+  const hood=WARD_CATS.some(c=>{ const it=ITEM_BY_ID[c.id+':'+o[c.id]]; return it&&it.hideHair; });
+  for(const c of WARD_CATS){ let it=ITEM_BY_ID[c.id+':'+o[c.id]]; if(!it||it.kind==='none') continue;
+    if(hood&&(c.id==='hair'||c.id==='hat')) continue; // капюшон надет — волосы и шапка под ним
+    if(it.kind==='glb'){ attachSkinned(fig,it); continue; }
+    if(!BUILD[it.kind]) continue; it=hairItem(it,o); BUILD[it.kind](it).forEach(p=>attachPart(fig,p)); }
   const tex=bodyTex(o.skin|0,o.eye|0);
   fig.skinMeshes.forEach(ms=>{ const m=ms.material; if(!m) return; if(tex){ m.map=tex; m.color.set(0xffffff); } else if(m.color) m.color.copy(lin(SKINS[o.skin|0]||SKINS[0])); });
 }
@@ -1345,7 +1427,7 @@ function thumb(it){
   const face='<circle cx="32" cy="37" r="13" fill="#F7DCCB" '+s+'/>';
   const shortH=`<path d="M17 33a15 15 0 0 1 30 0c-4-3-9-5-15-5s-11 2-15 5z" fill="${c}" ${s}/>`;
   let g='';
-  switch(it.kind){
+  switch(it.thumbKind||it.kind){
     case 'none': g='<path d="M22 22l20 20M42 22L22 42" stroke="#A79DB8" stroke-width="3" stroke-linecap="round"/>'; break;
     case 'bob': g=face+`<path d="M15 50V32a17 17 0 0 1 34 0v18h-7V35c-6-1-11-4-13-8-2 4-7 7-14 8v15z" fill="${c}" ${s}/>`; break;
     case 'short': g=face+shortH; break;
