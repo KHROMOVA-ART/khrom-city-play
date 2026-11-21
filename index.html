@@ -282,6 +282,46 @@ button{font:inherit;color:inherit;cursor:pointer}
 .intro-stub b{font-family:var(--hand);font-size:clamp(26px,4vw,38px);font-weight:700;line-height:1}
 .intro-stub ol{margin:4px 0 0;padding-left:22px;text-align:left;display:grid;gap:3px;font-size:14px;color:var(--ink);max-width:52ch}
 .intro-stub .note{margin:0}
+/* интро-слайдшоу: кадры с медленным наездом, слова пишутся поверх */
+.show{position:fixed;inset:0;z-index:25;background:#16121E;overflow:hidden;cursor:pointer;user-select:none}
+.show-frame{position:absolute;left:50%;top:50%;width:min(100vw,177.78vh);aspect-ratio:16/9;transform:translate(-50%,-50%);overflow:hidden;container-type:inline-size}
+.slide{position:absolute;inset:0;margin:0;opacity:0;transition:opacity 1s ease}
+.slide.on{opacity:1}
+.slide img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:var(--o);animation:kb var(--d) cubic-bezier(.35,0,.65,1) forwards}
+@keyframes kb{from{transform:translate(var(--x0),0) scale(var(--z0))}to{transform:translate(var(--x1),0) scale(var(--z1))}}
+.slide.shake img{animation:kb var(--d) cubic-bezier(.35,0,.65,1) forwards,shake .5s steps(4) 2}
+@keyframes shake{25%{translate:.5% 0;rotate:.4deg}75%{translate:-.5% 0;rotate:-.4deg}}
+.show-grain{position:absolute;inset:-10%;pointer-events:none;opacity:.16;mix-blend-mode:multiply;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .14 0 0 0 0 .25 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1s steps(8) infinite}
+@keyframes grain{12%{transform:translate(-2%,1%)}25%{transform:translate(1%,-2%)}37%{transform:translate(-1%,2%)}50%{transform:translate(2%,1%)}62%{transform:translate(-2%,-1%)}75%{transform:translate(1%,2%)}87%{transform:translate(-1%,-2%)}}
+.show-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(40,24,40,.38) 100%)}
+.show-text{position:absolute;inset:0;pointer-events:none}
+.show-text .w{display:inline-block;white-space:nowrap}
+.show-text .ch{display:inline-block;opacity:0;animation:ink .38s ease-out forwards}
+.show-text.done .ch{animation:none;opacity:1}
+@keyframes ink{from{opacity:0;transform:translateY(.12em) scale(1.25);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+.say-n{position:absolute;left:5cqw;right:30cqw;bottom:7cqw;margin:0;display:grid;gap:.6cqw;font-family:var(--hand);font-weight:700;font-size:4.4cqw;line-height:1.05;color:#FFF8EC;
+  -webkit-text-stroke:.5cqw var(--ink);paint-order:stroke fill;text-shadow:0 .4cqw 0 var(--ink),0 0 2.5cqw rgba(30,20,40,.45);transform:rotate(-1.5deg)}
+.say-d{position:absolute;bottom:6cqw;max-width:52cqw;background:#FFFCF5;border:.22cqw solid var(--ink);border-radius:1.6cqw;padding:1.4cqw 2.2cqw 1.6cqw;box-shadow:0 .5cqw 0 var(--ink);
+  font-family:var(--hand);font-weight:700;font-size:3.2cqw;line-height:1.1;color:var(--ink);animation:pop .35s cubic-bezier(.3,1.6,.5,1) both}
+.say-d.l{left:5cqw;transform:rotate(-1.2deg)} .say-d.r{right:5cqw;transform:rotate(1.2deg)}
+.say-d .who{position:absolute;top:-1.6cqw;left:2cqw;background:var(--c);border:.22cqw solid var(--ink);border-radius:99px;padding:.2cqw 1.1cqw;font-family:var(--body);font-weight:800;font-size:1.35cqw;line-height:1.4;letter-spacing:.02em}
+@keyframes pop{from{opacity:0;scale:.85}}
+.say-sfx{position:absolute;font-family:var(--hand);font-weight:700;font-size:6cqw;color:var(--butter);-webkit-text-stroke:.5cqw var(--ink);paint-order:stroke fill;text-shadow:0 .5cqw 0 var(--ink);transform:rotate(-12deg)}
+.say-t{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-family:var(--display);font-weight:700;font-size:10cqw;letter-spacing:.01em;color:#FFF8EC;
+  -webkit-text-stroke:.7cqw var(--ink);paint-order:stroke fill;text-shadow:0 1cqw 0 var(--ink),0 0 6cqw rgba(176,160,240,.7)}
+.say-t .ch{animation-duration:.6s}
+.show-bar{position:absolute;left:5cqw;right:5cqw;bottom:2.2cqw;display:flex;gap:.5cqw;pointer-events:none}
+.show-bar i{flex:1;height:.45cqw;min-height:3px;border-radius:9px;background:rgba(255,248,236,.3);overflow:hidden}
+.show-bar i::after{content:"";display:block;height:100%;width:0;background:#FFF8EC}
+.show-bar i.past::after{width:100%}
+.show-bar i.now::after{animation:fillbar var(--d) linear forwards}
+@keyframes fillbar{to{width:100%}}
+.show-skip{position:absolute;top:2.2cqw;right:2.2cqw;background:#FFFCF5;border:var(--b);border-radius:99px;padding:6px 14px;font-weight:800;font-size:13px;box-shadow:var(--sh-s);cursor:pointer;opacity:.85}
+.show-skip:hover{opacity:1}
+.show-hint{position:absolute;top:2.6cqw;left:2.6cqw;font-family:var(--hand);font-weight:700;font-size:18px;color:rgba(255,248,236,.75);pointer-events:none;transition:opacity 1s}
+@media (prefers-reduced-motion:reduce){.slide img,.show-grain{animation:none}.show-text .ch{animation-duration:.01s}}
 .btn{display:inline-flex;align-items:center;gap:8px;border:var(--b);background:var(--ink);color:var(--surface);border-radius:999px;padding:12px 16px 12px 22px;font-weight:800;font-size:15px;box-shadow:var(--sh)}
 .btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .btn:active{box-shadow:none;transform:translateY(4px)}
@@ -462,6 +502,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="mwin" role="dialog" aria-modal="true" aria-labelledby="mSetTitle">
       <div class="mwin-head"><b id="mSetTitle">Настройки</b><button class="mwin-x" data-close aria-label="Закрыть">×</button></div>
       <div class="mwin-body">
+        <div class="mrow"><span>Язык</span><div class="mseg" id="mLang" role="group" aria-label="Language"></div></div>
         <div class="mrow"><span>Контур фигурок</span><div class="mseg" id="mContour"></div></div>
         <div class="mrow"><span>Звук</span><div class="mseg"><button disabled>скоро</button></div></div>
         <div class="mrow"><span>Прогресс</span><div class="mseg"><button id="mReset">Начать заново: выбрать героя</button></div></div>
@@ -528,6 +569,16 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <button class="btn" id="introSkip">Начать игру <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
   </div>
+  <div class="show" id="introShow" hidden aria-label="Интро: история Кнопки">
+    <div class="show-frame" id="showFrame">
+      <div id="showSlides"></div>
+      <div class="show-vig"></div><div class="show-grain"></div>
+      <div class="show-text" id="showText" aria-live="polite"></div>
+      <div class="show-bar" id="showBar"></div>
+      <span class="show-hint" id="showHint">клик или → — дальше</span>
+      <button class="show-skip" id="showSkip">пропустить →</button>
+    </div>
+  </div>
 </div>
 
 <div class="lightbox" id="lightbox" hidden>
@@ -548,6 +599,107 @@ const T = THREE;
 const stage = document.getElementById('stage');
 const canvas = document.getElementById('gl');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- язык ----------
+   Код и разметка пишутся по-русски. Для других языков — словарь «русская фраза → перевод».
+   Наблюдатель (MutationObserver) сам переводит любой русский текст, появившийся на экране:
+   кнопки, подсказки, тосты, подписи для экранных читалок. Оригинал запоминается, поэтому
+   обратно на русский переключается без перезагрузки. Новая фраза в игре = новая строка в словаре.
+   Нет перевода — фраза остаётся русской (так видно, что забыли). */
+const LANGS=[{id:'ru',name:'Русский'},{id:'en',name:'English'}];
+let lang=(()=>{ try{ const s=localStorage.getItem('khrom-city-lang'); if(LANGS.some(l=>l.id===s)) return s; }catch(e){}
+  return /^(ru|be|uk|kk)/i.test(navigator.language||'')?'ru':'en'; })();
+const DICT={en:{
+  // шапка, режимы, меню «куда»
+  'Квартира':'Home','куда ▾':'go ▾','куда':'go to','Улица':'Street','тест':'test','Карта остановок':'Stop map','скоро':'soon',
+  '↺ главное меню':'↺ main menu','Ходить':'Walk','Гардероб':'Wardrobe','Режим':'Mode','Сцена KHROM City':'KHROM City scene',
+  'Хромов переулок':'Khromov Lane','← домой':'← home','двор':'yard','Двор откроется позже':'The yard opens later',
+  'твоя квартира · ходи стрелками или WASD · шкаф — переодеться · дверь — во двор':'your home · walk with arrows or WASD · wardrobe — change clothes · door — to the yard',
+  'тестовая улица · ходи стрелками или WASD · дом слева внизу':'test street · walk with arrows or WASD · home is bottom left',
+  'кликни по полу — Хромчик пойдёт':'click the floor to walk','тяни, чтобы покрутить':'drag to spin',
+  'синий':'blue','чёрный':'black','нет':'off',
+  // эмоции и фото
+  'Эмоции и фото':'Emotes and photo','Дневник':'Diary','Закрыть дневник':'Close diary',
+  'Сердце':'Heart','Сердце: прыжок':'Heart: jump','Привет':'Hi','Привет: помахать':'Hi: wave','Звезда':'Star','Звезда: покружиться':'Star: spin',
+  'Цветок':'Flower','Цветок: смутиться':'Flower: blush','Хмф':'Hmph','Хмф: топнуть':'Hmph: stomp','Фото':'Photo',
+  'рисуй маркером поверх кадра':'draw over the photo with a marker','Маркер':'Marker','Синий маркер':'Blue marker','Красный маркер':'Red marker',
+  'Жёлтый маркер':'Yellow marker','Белый маркер':'White marker','Чёрный маркер':'Black marker',
+  'Стереть':'Erase','Отмена':'Cancel','Вклеить в дневник':'Stick into diary',
+  'страница пока пустая':'this page is empty for now',
+  'Нажми «Фото» под сценой, порисуй маркером поверх кадра и вклей карточку сюда. Позже эти карточки уйдут в ленту KHROM City.':'Press “Photo” under the scene, doodle over it with a marker and stick the card here. Later these cards will go to the KHROM City feed.',
+  'Открыть фотокарточку':'Open photo card','Фото Хромчика':'Khromchik photo','Фотокарточка из дневника':'Photo card from the diary',
+  'Правый клик или долгое нажатие — сохранить картинку':'Right-click or long-press to save the picture','Удалить из дневника':'Remove from diary','Закрыть':'Close',
+  // гардероб
+  'Категории одежды':'Clothing categories','Причёски':'Hair','Верх':'Tops','Низ':'Bottoms','Обувь':'Shoes','Головные уборы':'Hats','Аксессуары':'Accessories',
+  'Предыдущая страница':'Previous page','Следующая страница':'Next page',
+  'цвет волос':'hair color','Цвет волос':'Hair color','цвет кожи':'skin color','Цвет кожи':'Skin color','цвет глаз':'eye color','Цвет глаз':'Eye color',
+  'имя':'name','как тебя зовут?':'what’s your name?',
+  'как в каталоге':'as in catalog','чёрные':'black','каштановые':'chestnut','рыжие':'ginger','блонд':'blond','розовые':'pink','лавандовые':'lavender','мятные':'mint','белые':'white',
+  'оливковые':'olive','карие':'brown','голубые':'blue','зелёные':'green','серые':'grey','фиалковые':'violet',
+  'без причёски':'no hair','каре':'bob','розовое каре':'pink bob','короткая':'short','пучок':'bun','хвостики':'pigtails','длинные':'long',
+  'майка':'tank top','футболка':'T-shirt','футболка с сердцем':'heart T-shirt','свитер в полоску':'striped sweater','рубашка в клетку':'checked shirt',
+  'худи-лиса':'fox hoodie','худи-зайка':'bunny hoodie','пуховик':'puffer jacket',
+  'без низа':'no bottoms','шорты':'shorts','лаковые брюки':'patent trousers','юбка в клетку':'plaid skirt','джинсы клёш':'flared jeans','карго':'cargo pants',
+  'босиком':'barefoot','кеды':'sneakers','розовые кеды':'pink sneakers','ботинки':'boots',
+  'без шапки':'no hat','кепка':'cap','шапка с помпоном':'pom-pom beanie','панама':'bucket hat','ушки':'ears',
+  'без аксессуаров':'no accessories','круглые очки':'round glasses','красные очки':'red glasses','наушники':'headphones','шарф в клетку':'plaid scarf',
+  // загрузка, меню, настройки
+  'варим кофе…':'brewing coffee…','считаем голубей…':'counting pigeons…','развешиваем бельё…':'hanging out the laundry…','ищем вторую варежку…':'looking for the other mitten…',
+  'сдуваем пыль с карты…':'dusting off the map…','качаемся на качелях…':'swinging on the swings…','готово!':'ready!',
+  'Старый двор: пятиэтажки, качели, голуби и кафе с полосатым навесом':'An old courtyard: five-storey blocks, swings, pigeons and a café with a striped awning',
+  'уютная игра про дорогу к мечте':'a cozy game about the road to your dream','Главное меню':'Main menu','Настройки':'Settings','Выйти':'Exit','прототип · 20.11':'prototype · 20.11',
+  'Контур фигурок':'Figure outline','Звук':'Sound','Язык':'Language','Прогресс':'Progress','Начать заново: выбрать героя':'Start over: pick a hero',
+  'Начнём заново: после START выбери героя':'Starting over: pick a hero after START',
+  'Пока-пока!':'Bye-bye!','До встречи во дворе. Можно закрыть вкладку — Кнопка подождёт.':'See you in the yard. You can close the tab — Knopka will wait.','Остаться':'Stay',
+  'Модель Хромчика не загрузилась':'The Khromchik model failed to load','Кнопка':'Knopka',
+  // выбор героя и интро
+  'За кого будешь играть?':'Who will you play as?','Сюжет один и тот же — меняется герой. Потом в шкафу можно переодеться и стать кем хочешь.':'The story is the same — only the hero changes. Later you can change clothes in the wardrobe and become whoever you want.',
+  'девочка':'girl','мальчик':'boy','Играть за девочку':'Play as the girl','Играть за мальчика':'Play as the boy',
+  'khrom.city / интро':'khrom.city / intro','здесь будет ролик':'the intro video goes here','Положи видео в папку':'Put the video into the folder','— оно заиграет здесь само. Пока раскадровка:':'— it will play here automatically. Storyboard for now:',
+  'Дневник на столе, фото двора — зум в кафе: каждый день одни и те же лица, разговоры, кофе.':'A diary on the desk, a photo of the yard — zoom into the café: the same faces, talks and coffee every day.',
+  'Звенит колокольчик — входит шикарная женщина. «Вы не местная?» — «Когда-то была».':'The bell rings — a glamorous woman walks in. “You’re not from here?” — “I used to be.”',
+  'Она когда-то сама стояла за стойкой и однажды решилась на мечту.':'She once stood behind a counter herself, and one day she dared to chase her dream.',
+  'На доске воспоминаний — открытка с большим городом: KHROM City.':'On the memory board — a postcard of a big city: KHROM City.',
+  'Дома: шкаф, сумка, и в залежах — старая карта. Внизу «мы», наверху KHROM City.':'At home: a wardrobe, a bag, and buried in the clutter — an old map. “Us” at the bottom, KHROM City at the top.',
+  'Она стирает пыль — появляется цель.':'She wipes off the dust — a goal appears.','Начать игру':'Start the game',
+  'Интро: история Кнопки':'Intro: Knopka’s story','клик или → — дальше':'click or → — next','пропустить →':'skip →',
+  // слова интро-слайдшоу (INTRO)
+  'Каждый день одни и те же лица,':'Every day, the same faces,','одни и те же разговоры.':'the same conversations.','Один и тот же кофе.':'The same coffee.',
+  'дзынь!':'ding!','гостья':'guest','Кнопка':'Knopka',
+  'Миленько тут у вас. Капучино средний, пожалуйста.':'Cute place you have here. A medium cappuccino, please.',
+  'Вы не местная, да? Я тут всех знаю)))':'You’re not from around here, are you? I know everyone here)))',
+  'Когда-то была)) Вот, приехала брата навестить.':'I used to be)) Came to visit my brother.',
+  'Простите за допрос… а почему вы уехали? И как?':'Sorry for the interrogation… but why did you leave? And how?',
+  'Хо-хо, дорогая! Я мечтала покорять мир и большие города…':'Oh-ho, darling! I dreamed of conquering the world and big cities…',
+  '…и однажды просто решилась на свою мечту и вышла из-за барной стойки)))':'…and one day I just went for my dream and stepped out from behind the counter)))',
+}};
+// фразы с вставками: «Контур: синий», «Глаза: карие» и т.п.
+const DICT_RX={en:[
+  [/^Контур: (.+)$/, a=>'Outline: '+tr(a)], [/^Волосы: (.+)$/, a=>'Hair: '+tr(a)], [/^Глаза: (.+)$/, a=>'Eyes: '+tr(a)],
+  [/^Цвет кожи (\d+)$/, a=>'Skin color '+a], [/^С возвращением, (.+)!$/, a=>'Welcome back, '+tr(a)+'!'],
+  [/^Играешь за (девочку|мальчика)$/, a=>'Playing as the '+(a==='девочку'?'girl':'boy')], [/^здесь будет ролик · (.+)$/, a=>'the intro video goes here · '+tr(a)],
+]};
+function tr(s){ if(lang==='ru'||!s) return s; const d=DICT[lang]||{}; if(d[s]!=null) return d[s];
+  for(const [rx,f] of DICT_RX[lang]||[]){ const m=s.match(rx); if(m) return f(m[1]); } return s; }
+const CYR=/[а-яё]/i, I18N_ATTRS=['aria-label','title','placeholder','alt'], i18nMem=new WeakMap();
+// перевести один текстовый узел или атрибут, сохранив пробелы вокруг; запоминаем {оригинал, перевод}
+function i18nText(n){ const v=n.nodeValue, mem=i18nMem.get(n);
+  if(lang==='ru'){ if(mem&&v===mem.t) n.nodeValue=mem.o; return; }
+  const src=(mem&&v===mem.t)?mem.o:v; if(!CYR.test(src)) return;
+  const k=src.trim(), out=src.replace(k,tr(k)); i18nMem.set(n,{o:src,t:out}); if(v!==out) n.nodeValue=out; }
+function i18nAttr(el,a){ const v=el.getAttribute(a); if(v==null) return; let mem=i18nMem.get(el); if(!mem) i18nMem.set(el,mem={});
+  const m=mem[a]; if(lang==='ru'){ if(m&&v===m.t) el.setAttribute(a,m.o); return; }
+  const src=(m&&v===m.t)?m.o:v; if(!CYR.test(src)) return; const out=tr(src.trim()); mem[a]={o:src,t:out}; if(v!==out) el.setAttribute(a,out); }
+function i18nTree(root){ if(root.nodeType===3){ i18nText(root); return; } if(root.nodeType!==1||root.tagName==='SCRIPT'||root.tagName==='STYLE') return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT); let n; while(n=w.nextNode()) if(n.parentElement.tagName!=='SCRIPT'&&n.parentElement.tagName!=='STYLE') i18nText(n);
+  [root,...root.querySelectorAll('['+I18N_ATTRS.join('],[')+']')].forEach(el=>I18N_ATTRS.forEach(a=>el.hasAttribute&&el.hasAttribute(a)&&i18nAttr(el,a))); }
+const i18nObs=new MutationObserver(list=>{ if(lang==='ru') return; i18nObs.disconnect();
+  for(const r of list){ if(r.type==='childList') r.addedNodes.forEach(i18nTree); else if(r.type==='characterData') i18nText(r.target); else i18nAttr(r.target,r.attributeName); }
+  i18nWatch(); });
+function i18nWatch(){ i18nObs.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:I18N_ATTRS}); }
+function setLang(id){ lang=id; try{ localStorage.setItem('khrom-city-lang',id); }catch(e){}
+  document.documentElement.lang=id; i18nObs.disconnect(); i18nTree(document.body); i18nWatch(); }
+setLang(lang);
 
 /* ---------- renderer / scene ---------- */
 const renderer = new T.WebGLRenderer({canvas, antialias:true, alpha:true});
@@ -830,8 +982,8 @@ LOCS.home = (function buildHome(){
   const ex=door(room,'#8A5A3A','во двор →'); ex.group.position.set(-X+.02,0,1.15); ex.group.rotation.y=Math.PI/2;
   const warm=new T.PointLight(lin('#ffd6a2'), .5, 7, 2); warm.position.set(0,2.2,-.6); room.add(warm);
   return {
-    id:'home', name:'Квартира', group:room, bg:null, wardrobe:true,
-    cam:{pos:[0,6.3,10.8], look:[0,.6,-.05], fov:32},
+    id:'home', name:'Квартира', group:room, bg:'#1B2141', wardrobe:true,
+    cam:{pos:[0,6.3,10.8], look:[0,.6,-.05], fov:32, fill:3.9, fillH:2.4, lookUp:.35}, // fill/fillH — полуширина и полувысота комнаты в кадре: ими заполняем экран
     light:{pos:[-3.5,8,5.5], color:'#fff1e0', k:1.35},
     bounds:{x0:-3.6,x1:3.7,z0:-.55,z1:1.9},
     obst:[{x:-3.05,z:-1.05,r:.95},{x:1.3,z:-.85,r:.4},{x:1.45,z:-1.45,r:.6},{x:3.35,z:-1.42,r:.82}],
@@ -1001,7 +1153,16 @@ function camTargets(){
     wantFov=2*Math.atan(Math.tan(loc.fov*Math.PI/360)*c.H/(loc.ih*c.s))*180/Math.PI;
     return;
   }
-  if(mode==='city'){
+  if(mode==='city' && loc.cam.fill){
+    // комната во весь экран: камера подъезжает так, чтобы ширина кадра = ширине комнаты, и едет за героем
+    const c=loc.cam, fov=a<.9?c.fov+10:c.fov, tf=Math.tan(fov*Math.PI/360);
+    const dx=c.pos[0]-c.look[0], dy=c.pos[1]-c.look[1], dz=c.pos[2]-c.look[2], D=Math.hypot(dx,dy,dz);
+    const f=Math.min(1, c.fill/(D*tf*a), c.fillH/(D*tf)), lim=Math.max(0,c.fill-D*f*tf*a), limV=Math.max(0,c.fillH-D*f*tf);
+    const cl=(v,l)=>Math.max(-l,Math.min(l,v)), sinT=dy/D; // наклон камеры: сдвиг по полу на dz даёт сдвиг в кадре dz*sinT
+    wantLook.set(cl(world.position.x*.8,lim), c.look[1]+(c.lookUp||0), c.look[2]+cl((world.position.z-.7)*.8,limV/sinT));
+    wantPos.set(wantLook.x+dx*f, wantLook.y+dy*f, wantLook.z+dz*f);
+    wantFov=fov;
+  } else if(mode==='city'){
     const c=loc.cam; let f=1, fov=c.fov;
     if(a<.9){ f=1.28; fov=c.fov+14; } else if(a<1.3){ f=1.14; fov=c.fov+6; }
     wantLook.set(c.look[0],c.look[1],c.look[2]);
@@ -1400,6 +1561,17 @@ function bodyTex(skin,eye){
 const hairItem=(it,o)=>it.cat==='hair'&&o&&o.hc&&HAIR_COLORS[o.hc]?Object.assign({},it,{c:HAIR_COLORS[o.hc]}):it;
 const DEFAULT_OUTFIT={girl:{hair:'bob',top:'hoodie-fox',bottom:'wide',shoes:'sneakers',hat:'none',acc:'none'},
                       boy:{hair:'short',top:'stripes',bottom:'cargo',shoes:'sneakers',hat:'cap',acc:'none'}};
+/* волосы под капюшоном: макушку и затылок прячет капюшон, снаружи остаются чёлка и пряди у лица.
+   Пряди — узкие полоски сферы головы чуть шире черепа (phi=π/2 — лицо, theta=0 — макушка). */
+const lockG=(sx,t0,t1,r=.355)=>gS(r,3,5,(sx>0?.74:.16)*PI,.1*PI,t0*PI,(t1-t0)*PI);
+const hoodFringeG=(t1)=>gS(.358,12,3,.22*PI,.56*PI,.28*PI,(t1-.28)*PI);
+const UNDER_HOOD={
+  short:it=>{ const m=hairM(it); return [P('head',hoodFringeG(.4),m,[0,HY,0])]; },
+  bob:it=>{ const m=hairM(it); return [P('head',hoodFringeG(.45),m,[0,HY,0]),...SIDES.map(([sx])=>P('head',lockG(sx,.3,.68),m,[0,HY,0]))]; },
+  long:it=>{ const m=hairM(it); return [...UNDER_HOOD.bob(it),
+    ...SIDES.map(([sx])=>P('chest',gC(.055,.03,.42,5),m,[sx*.25,1.2,.24],[-.15,0,sx*-.08],[1,1,.55]))]; },
+};
+UNDER_HOOD.bun=UNDER_HOOD.short; UNDER_HOOD.pigtails=UNDER_HOOD.bob;
 function attachPart(fig,p){
   const m=new T.Mesh(p.geo,p.mat); m.position.set(...p.pos); if(p.rot) m.rotation.set(...p.rot); if(p.scl) m.scale.set(...p.scl);
   m.castShadow=true; m.frustumCulled=false; m.updateMatrix();
@@ -1412,7 +1584,8 @@ function dress(fig,o){
   o=o||{};
   const hood=WARD_CATS.some(c=>{ const it=ITEM_BY_ID[c.id+':'+o[c.id]]; return it&&it.hideHair; });
   for(const c of WARD_CATS){ let it=ITEM_BY_ID[c.id+':'+o[c.id]]; if(!it||it.kind==='none') continue;
-    if(hood&&(c.id==='hair'||c.id==='hat')) continue; // капюшон надет — волосы и шапка под ним
+    if(hood&&c.id==='hat') continue; // капюшон надет — шапка не нужна
+    if(hood&&c.id==='hair'){ it=hairItem(it,o); (UNDER_HOOD[it.kind]||UNDER_HOOD.short)(it).forEach(p=>attachPart(fig,p)); continue; } // волосы убраны под капюшон: видно чёлку и пряди
     if(it.kind==='glb'){ attachSkinned(fig,it); continue; }
     if(!BUILD[it.kind]) continue; it=hairItem(it,o); BUILD[it.kind](it).forEach(p=>attachPart(fig,p)); }
   const tex=bodyTex(o.skin|0,o.eye|0);
@@ -1468,7 +1641,7 @@ function renderWardrobe(){
   $('pgNum').textContent=`${wardPage+1} / ${pages}`; $('pgPrev').disabled=wardPage===0; $('pgNext').disabled=wardPage>=pages-1;
   $('skins').innerHTML=SKINS.map((h,i)=>`<button class="skin" data-skin="${i}" style="--c:${h==='#FFFFFF'?'#F6DCCD':h}" aria-pressed="${(state.skin|0)===i}" aria-label="Цвет кожи ${i+1}"></button>`).join('');
   $('eyes').innerHTML=EYES.map((e,i)=>`<button class="skin eye" data-eye="${i}" style="--c:${e.c}" aria-pressed="${(state.eye|0)===i}" aria-label="Глаза: ${e.n}" title="${e.n}"></button>`).join('');
-  const nm=$('heroName'); if(document.activeElement!==nm) nm.value=state.name||'';
+  const nm=$('heroName'); if(document.activeElement!==nm) nm.value=state.name==='Кнопка'?tr('Кнопка'):(state.name||''); // имя по умолчанию — на языке игры, своё имя игрока не трогаем
   fitWardCard();
 }
 // карточка гардероба не ниже колонки вкладок: иначе выбранная нижняя вкладка «врастает» в пустоту
@@ -1555,7 +1728,7 @@ $('p-save').onclick=()=>{
   o.putImageData(id,0,0);
   const vg=o.createRadialGradient(432,500,300,432,540,760); vg.addColorStop(0,'rgba(60,35,20,0)'); vg.addColorStop(1,'rgba(60,35,20,.4)'); o.fillStyle=vg; o.fillRect(0,0,864,1080);
   o.drawImage(draw,0,0,864,1080);
-  o.font='700 38px Caveat, cursive'; o.fillStyle='rgba(251,245,236,.95)'; o.save(); o.translate(36,1040); o.rotate(-.03); o.fillText('KHROM City · '+loc.name,0,0); o.restore();
+  o.font='700 38px Caveat, cursive'; o.fillStyle='rgba(251,245,236,.95)'; o.save(); o.translate(36,1040); o.rotate(-.03); o.fillText('KHROM City · '+tr(loc.name),0,0); o.restore();
   const now=new Date(); const date=now.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
   diary.unshift({src:out.toDataURL('image/jpeg',.86), date});
   if(diary.length>12) diary.length=12;
@@ -1631,19 +1804,108 @@ function updateOthers(dt){
 const startEl=$('start'), stepHero=$('stepHero'), stepIntro=$('stepIntro'), vid=$('introVideo'), stub=$('introStub');
 const HERO_NAME={girl:'девочку', boy:'мальчика'};
 function showStart(){ vid.pause(); startEl.hidden=false; stepHero.hidden=false; stepIntro.hidden=true; const b=startEl.querySelector('.hero-card'); if(b) b.focus(); }
-function finishIntro(){ vid.pause(); vid.removeAttribute('src'); vid.load(); startEl.hidden=true; toast('Играешь за '+HERO_NAME[state.hero]); }
+function finishIntro(){ stopShow(); vid.pause(); vid.removeAttribute('src'); vid.load(); startEl.hidden=true; toast('Играешь за '+HERO_NAME[state.hero]); }
 startEl.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{
   state.hero=b.dataset.hero; state.outfit=Object.assign({},DEFAULT_OUTFIT[state.hero]); dress(char,outfitNow()); applyContour(); renderWardrobe(); netSendOutfit(); save();
-  stepHero.hidden=true; stepIntro.hidden=false;
-  $('stubTitle').textContent='здесь будет ролик · '+(state.hero==='girl'?'девочка':'мальчик');
-  stub.hidden=true; vid.hidden=false;
-  vid.onerror=()=>{ stub.hidden=false; vid.hidden=true; };
-  vid.onended=finishIntro;
-  vid.src='intro/intro-'+state.hero+'.mp4';
-  vid.play().catch(()=>{});
-  $('introSkip').focus();
+  stepHero.hidden=true; startShow();
 });
 $('introSkip').onclick=finishIntro;
+
+/* ---------- интро-слайдшоу ----------
+   Не анимация, а «вайбовое» слайдшоу: каждый кадр медленно наезжает/плывёт (Ken Burns), кадры сменяются наплывом,
+   поверх пишутся слова — по буквам, рукописным шрифтом. Зерно дёргается 8 раз в секунду, как маркерный контур.
+   Кадры — intro/frames/NN.jpg (из Nano Banana, 1920 px). Чтобы добавить кадр или поменять текст — правь INTRO.
+   Поля кадра: f — номер файла; z — масштаб [в начале, в конце]; x — сдвиг по горизонтали в % [в начале, в конце];
+   o — точка, к которой наезжаем; t — сколько секунд минимум; shake — кадр трясётся (звонок);
+   vo — файл озвучки (кадр длится, пока она не закончится); say — что пишется поверх:
+   {n:'…'} — голос рассказчика, {g:'…'} — гостья, {k:'…'} — Кнопка, {sfx:'…',at:[x%,y%]} — звук-каракуля, {title:'…'} — название. */
+const INTRO=[
+  {f:1,  z:[1,1.12],    o:'50% 62%', t:4.2},
+  {f:2,  z:[1,1.16],    o:'48% 46%', t:3.6},
+  {f:3,  z:[1.04,1.16], o:'52% 58%', t:3.8},
+  {f:4,  z:[1.1,1.1],   x:[3,-3],    say:[{n:'Каждый день одни и те же лица,'},{n:'одни и те же разговоры.'}]},
+  {f:5,  z:[1.12,1.02], o:'40% 55%', say:[{n:'Один и тот же кофе.'}]},
+  {f:6,  z:[1.1,1.1],   x:[-3,3],    t:4.2},
+  {f:7,  z:[1,1.1],     o:'42% 25%', t:2.8, shake:1, say:[{sfx:'дзынь!',at:[50,14]}]},
+  {f:8,  z:[1,1.12],    o:'50% 45%', t:3.8},
+  {f:9,  z:[1.02,1.1],  o:'56% 40%', say:[{g:'Миленько тут у вас. Капучино средний, пожалуйста.'}]},
+  {f:10, z:[1.08,1.08], x:[2,-2],    say:[{k:'Вы не местная, да? Я тут всех знаю)))'}]},
+  {f:11, z:[1,1.1],     o:'45% 55%', say:[{g:'Когда-то была)) Вот, приехала брата навестить.'}]},
+  {f:12, z:[1,1.08],    o:'50% 35%', say:[{k:'Простите за допрос… а почему вы уехали? И как?'}]},
+  {f:13, z:[1.04,1.14], o:'48% 40%', say:[{g:'Хо-хо, дорогая! Я мечтала покорять мир и большие города…'}]},
+  {f:14, z:[1,1.2],     o:'50% 45%', say:[{g:'…и однажды просто решилась на свою мечту и вышла из-за барной стойки)))'}]},
+  {f:15, z:[1.1,1],     o:'50% 50%', t:3.4},
+  {f:16, z:[1.08,1.08], x:[-2,2],    t:3.6},
+  {f:17, z:[1,1.15],    o:'25% 45%', t:4},
+  {f:18, z:[1,1.18],    o:'50% 45%', t:6, say:[{title:'KHROM City'}]},
+];
+const SHOW={on:false,i:-1,timer:0,textEnd:0,audio:null}, CH_N=.055, CH_D=.035;
+const showEl=$('introShow'), showSlides=$('showSlides'), showText=$('showText'), showBar=$('showBar');
+const frameSrc=f=>'intro/frames/'+String(f).padStart(2,'0')+'.jpg';
+const sayStr=l=>tr(l.n||l.g||l.k||l.sfx||l.title||''); // tr — перевод на выбранный язык
+function inkText(str,delay,per){ // буквы проявляются по одной, как будто их пишут
+  // слово целиком в неразрывном span — иначе строка рвётся посреди слова
+  let i=0; return str.split(' ').map(w=>'<span class="w">'+[...w].map(c=>`<span class="ch" style="animation-delay:${(delay+(i++)*per).toFixed(3)}s">${c==='<'?'&lt;':c}</span>`).join('')+'</span>'+(i++,'')).join(' ');
+}
+function startShow(){
+  // сначала пробуем готовый ролик intro/intro-<hero>.mp4; нет — слайдшоу
+  stepIntro.hidden=true; vid.onended=finishIntro;
+  vid.onerror=()=>{ vid.removeAttribute('src'); runShow(); };
+  vid.oncanplay=()=>{ stepIntro.hidden=false; stub.hidden=true; vid.hidden=false; vid.play().catch(()=>{}); $('introSkip').focus(); };
+  vid.src='intro/intro-'+state.hero+'.mp4';
+}
+function runShow(){
+  SHOW.on=true; showEl.hidden=false; showSlides.innerHTML=''; showText.innerHTML='';
+  showBar.innerHTML=INTRO.map(()=>'<i></i>').join('');
+  $('showHint').style.opacity=1; setTimeout(()=>$('showHint').style.opacity=0,4000);
+  INTRO.slice(0,3).forEach(s=>{ new Image().src=frameSrc(s.f); });
+  showSlide(0);
+}
+function showSlide(i){
+  clearTimeout(SHOW.timer); if(SHOW.audio){ SHOW.audio.pause(); SHOW.audio=null; }
+  if(i<0) i=0;
+  if(i>=INTRO.length) return finishIntro();
+  SHOW.i=i; const s=INTRO[i], say=s.say||[];
+  // сколько кадр висит: дописать все строки + время прочитать
+  let t=.5, html='';
+  const lines=say.map(l=>{ const d=t, per=l.n||l.title?CH_N:CH_D; t+=sayStr(l).length*per+.45; return {l,d,per}; });
+  const narr=lines.filter(x=>x.l.n);
+  if(narr.length) html+=`<p class="say-n">${narr.map(x=>`<span>${inkText(sayStr(x.l),x.d,x.per)}</span>`).join('')}</p>`;
+  lines.forEach(({l,d,per})=>{
+    if(l.g||l.k){ const g=!!l.g; html+=`<div class="say-d ${g?'r':'l'}" style="animation-delay:${d-.15}s"><span class="who" style="--c:var(${g?'--peach':'--butter'})">${g?tr('гостья'):(state.name||tr('Кнопка'))}</span>${inkText(sayStr(l),d+.1,per)}</div>`; }
+    if(l.sfx) html+=`<span class="say-sfx" style="left:${l.at[0]}%;top:${l.at[1]}%">${inkText(sayStr(l),d,.06)}</span>`;
+    if(l.title) html+=`<p class="say-t"><span>${inkText(l.title,d+.6,.09)}</span></p>`;
+  });
+  SHOW.textEnd=say.length?performance.now()+t*1000:0;
+  const read=say.reduce((a,l)=>a+sayStr(l).length*.03,0);
+  const dur=Math.max(s.t||3.5, t+read+1.4);
+  // кадр: новый поверх старого, наплыв
+  const fig=document.createElement('figure'); fig.className='slide'+(s.shake?' shake':'');
+  const z=s.z||[1,1.1], x=s.x||[0,0];
+  fig.style.cssText=`--d:${dur+1.2}s;--z0:${z[0]};--z1:${z[1]};--x0:${x[0]}%;--x1:${x[1]}%;--o:${s.o||'50% 50%'}`;
+  fig.innerHTML=`<img src="${frameSrc(s.f)}" alt="">`;
+  showSlides.appendChild(fig); fig.offsetWidth; fig.classList.add('on');
+  [...showSlides.children].slice(0,-1).forEach(old=>{ old.classList.remove('on'); setTimeout(()=>old.remove(),1100); });
+  showText.className='show-text'; showText.innerHTML=html;
+  [...showBar.children].forEach((b,k)=>{ b.className=k<i?'past':k===i?'now':''; b.style.setProperty('--d',dur+'s'); });
+  const nx=INTRO[i+1]; if(nx) new Image().src=frameSrc(nx.f);
+  SHOW.timer=setTimeout(()=>showSlide(i+1),dur*1000);
+  if(s.vo){ // озвучка: кадр ждёт её конца
+    const a=SHOW.audio=new Audio(s.vo); a.play().catch(()=>{});
+    a.onloadedmetadata=()=>{ if(a.duration+.6>dur){ clearTimeout(SHOW.timer); SHOW.timer=setTimeout(()=>showSlide(i+1),(a.duration+.6)*1000); const b=showBar.children[i]; b.style.setProperty('--d',(a.duration+.6)+'s'); } };
+  }
+}
+function showNext(){ // пока слова пишутся — дописать сразу, иначе следующий кадр
+  if(performance.now()<SHOW.textEnd && !showText.classList.contains('done')){ showText.classList.add('done'); SHOW.textEnd=0; return; }
+  showSlide(SHOW.i+1);
+}
+function stopShow(){ if(!SHOW.on) return; SHOW.on=false; clearTimeout(SHOW.timer); if(SHOW.audio) SHOW.audio.pause(); showEl.hidden=true; showSlides.innerHTML=''; }
+showEl.onclick=e=>{ if(e.target.id==='showSkip') return finishIntro(); showNext(); };
+addEventListener('keydown',e=>{ if(!SHOW.on) return;
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'){ e.preventDefault(); showNext(); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); showSlide(SHOW.i-1); }
+  else if(e.key==='Escape') finishIntro();
+});
 $('restart').onclick=()=>{ metroMenu.hidden=true; stBtn.setAttribute('aria-expanded',false); showMenu(); };
 
 /* ---------- загрузка → главное меню ----------
@@ -1677,7 +1939,9 @@ function showMenu(){ startEl.hidden=true; menuEl.hidden=false; $('mStart').focus
 $('mStart').onclick=()=>{ menuEl.hidden=true; if(!state.hero) showStart(); else toast('С возвращением, '+(state.name||'Кнопка')+'!'); };
 function renderMenuContour(){ $('mContour').innerHTML=CONTOURS.map((c,i)=>`<button data-i="${i}" aria-pressed="${i===contourIdx}">${c.name}</button>`).join(''); }
 $('mContour').onclick=e=>{ const b=e.target.closest('[data-i]'); if(!b) return; contourIdx=+b.dataset.i; applyContour(); save(); renderMenuContour(); };
-$('mSettings').onclick=()=>{ renderMenuContour(); $('mSetWin').hidden=false; $('mSetWin').querySelector('[data-close]').focus(); };
+function renderMenuLang(){ $('mLang').innerHTML=LANGS.map(l=>`<button data-l="${l.id}" lang="${l.id}" aria-pressed="${l.id===lang}">${l.name}</button>`).join(''); }
+$('mLang').onclick=e=>{ const b=e.target.closest('[data-l]'); if(!b) return; setLang(b.dataset.l); renderMenuLang(); renderWardrobe(); };
+$('mSettings').onclick=()=>{ renderMenuContour(); renderMenuLang();$('mSetWin').hidden=false; $('mSetWin').querySelector('[data-close]').focus(); };
 $('mReset').onclick=()=>{ state.hero=null; state.outfit=null; save(); $('mSetWin').hidden=true; toast('Начнём заново: после START выбери героя'); $('mStart').focus(); };
 $('mExit').onclick=()=>{ $('mByeWin').hidden=false; $('mByeWin').querySelector('[data-close]').focus(); };
 menuEl.querySelectorAll('.mwin-back').forEach(w=>{ w.addEventListener('click',e=>{ if(e.target===w||e.target.closest('[data-close]')){ w.hidden=true; $('mStart').focus(); } }); });
