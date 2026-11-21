@@ -212,7 +212,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* главное меню: картинка двора, тополиный пух, карточка-стикер с кнопками */
 .menu{position:fixed;inset:0;z-index:30;overflow:hidden;background:#2E2440}
-.menu-bg{position:absolute;inset:-3%;background:url(bg/menu.jpg) center/cover no-repeat;animation:kenburns 26s ease-in-out infinite alternate;transform-origin:65% 60%}
+.menu-bg{position:absolute;inset:-3%;background:url(bg/menu.jpg?v=2) center/cover no-repeat;animation:kenburns 26s ease-in-out infinite alternate;transform-origin:65% 60%}
 @keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.07) translate(-1.2%,-1%)}}
 .menu::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(46,36,64,.38),rgba(46,36,64,0) 55%);pointer-events:none}
 .fluff{position:absolute;inset:0;pointer-events:none;z-index:1}
@@ -289,6 +289,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .slide.on{opacity:1}
 .slide img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:var(--o);animation:kb var(--d) cubic-bezier(.35,0,.65,1) forwards}
 @keyframes kb{from{transform:translate(var(--x0),0) scale(var(--z0))}to{transform:translate(var(--x1),0) scale(var(--z1))}}
+.slide video{width:100%;height:100%;object-fit:cover;display:block}
 .slide.shake img{animation:kb var(--d) cubic-bezier(.35,0,.65,1) forwards,shake .5s steps(4) 2}
 @keyframes shake{25%{translate:.5% 0;rotate:.4deg}75%{translate:-.5% 0;rotate:-.4deg}}
 .show-grain{position:absolute;inset:-10%;pointer-events:none;opacity:.16;mix-blend-mode:multiply;
@@ -308,16 +309,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .say-d.l{left:5cqw;transform:rotate(-1.2deg)} .say-d.r{right:5cqw;transform:rotate(1.2deg)}
 .say-d .who{position:absolute;top:-1.6cqw;left:2cqw;background:var(--c);border:.22cqw solid var(--ink);border-radius:99px;padding:.2cqw 1.1cqw;font-family:var(--body);font-weight:800;font-size:1.35cqw;line-height:1.4;letter-spacing:.02em}
 @keyframes pop{from{opacity:0;scale:.85}}
+@keyframes bubout{to{opacity:0;scale:.92}}
 .say-sfx{position:absolute;font-family:var(--hand);font-weight:700;font-size:6cqw;color:var(--butter);-webkit-text-stroke:.5cqw var(--ink);paint-order:stroke fill;text-shadow:0 .5cqw 0 var(--ink);transform:rotate(-12deg)}
 .say-t{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-family:var(--display);font-weight:700;font-size:10cqw;letter-spacing:.01em;color:#FFF8EC;
   -webkit-text-stroke:.7cqw var(--ink);paint-order:stroke fill;text-shadow:0 1cqw 0 var(--ink),0 0 6cqw rgba(176,160,240,.7)}
 .say-t .ch{animation-duration:.6s}
-.show-bar{position:absolute;left:5cqw;right:5cqw;bottom:2.2cqw;display:flex;gap:.5cqw;pointer-events:none}
-.show-bar i{flex:1;height:.45cqw;min-height:3px;border-radius:9px;background:rgba(255,248,236,.3);overflow:hidden}
-.show-bar i::after{content:"";display:block;height:100%;width:0;background:#FFF8EC}
-.show-bar i.past::after{width:100%}
-.show-bar i.now::after{animation:fillbar var(--d) linear forwards}
-@keyframes fillbar{to{width:100%}}
 .show-skip{position:absolute;top:2.2cqw;right:2.2cqw;background:#FFFCF5;border:var(--b);border-radius:99px;padding:6px 14px;font-weight:800;font-size:13px;box-shadow:var(--sh-s);cursor:pointer;opacity:.85}
 .show-skip:hover{opacity:1}
 .show-hint{position:absolute;top:2.6cqw;left:2.6cqw;font-family:var(--hand);font-weight:700;font-size:18px;color:rgba(255,248,236,.75);pointer-events:none;transition:opacity 1s}
@@ -574,7 +570,6 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div id="showSlides"></div>
       <div class="show-vig"></div><div class="show-grain"></div>
       <div class="show-text" id="showText" aria-live="polite"></div>
-      <div class="show-bar" id="showBar"></div>
       <span class="show-hint" id="showHint">клик или → — дальше</span>
       <button class="show-skip" id="showSkip">пропустить →</button>
     </div>
@@ -664,14 +659,17 @@ const DICT={en:{
   'Она стирает пыль — появляется цель.':'She wipes off the dust — a goal appears.','Начать игру':'Start the game',
   'Интро: история Кнопки':'Intro: Knopka’s story','клик или → — дальше':'click or → — next','пропустить →':'skip →',
   // слова интро-слайдшоу (INTRO)
-  'Каждый день одни и те же лица,':'Every day, the same faces,','одни и те же разговоры.':'the same conversations.','Один и тот же кофе.':'The same coffee.',
-  'дзынь!':'ding!','гостья':'guest','Кнопка':'Knopka',
-  'Миленько тут у вас. Капучино средний, пожалуйста.':'Cute place you have here. A medium cappuccino, please.',
+  'Добро пожаловать…':'Welcome…','…в мою жизнь.':'…to my life.',
+  'Каждый день одни и те же лица,':'Every day, the same faces,','одни и те же разговоры':'the same conversations','и чужие исполненные мечты.':'and other people’s dreams come true.',
+  'дзынь!':'ding!','пшшшшшш':'pssshhhh','гостья':'guest','Кнопка':'Knopka',
+  'Миленько тут у вас.':'Cute place you have here.','Капучино средний, пожалуйста.':'A medium cappuccino, please.',
   'Вы не местная, да? Я тут всех знаю)))':'You’re not from around here, are you? I know everyone here)))',
-  'Когда-то была)) Вот, приехала брата навестить.':'I used to be)) Came to visit my brother.',
-  'Простите за допрос… а почему вы уехали? И как?':'Sorry for the interrogation… but why did you leave? And how?',
-  'Хо-хо, дорогая! Я мечтала покорять мир и большие города…':'Oh-ho, darling! I dreamed of conquering the world and big cities…',
-  '…и однажды просто решилась на свою мечту и вышла из-за барной стойки)))':'…and one day I just went for my dream and stepped out from behind the counter)))',
+  'Когда-то была)) Но вот, приехала брата навестить)':'I used to be)) Just came to visit my brother)',
+  'А как вы смогли отсюда уехать?':'How did you manage to leave this place?',
+  'Мне кажется, что я никогда отсюда не вырвусь… денег хватает только на жизнь здесь…':'I feel like I’ll never get out of here… I only earn enough to live here…',
+  '…да и кто я, чтобы даже мечтать о больших городах…':'…and who am I to even dream about big cities…',
+  'Хо-хо, дорогая, не закапывай себя так!':'Oh-ho, darling, don’t bury yourself like that!','Все мы достойны любых мечтаний.':'We all deserve any dream we like.',
+  'Однажды нужно лишь сделать свой первый шаг наружу, а потом продолжать играть)))':'One day you just take your first step outside, and then keep playing)))',
 }};
 // фразы с вставками: «Контур: синий», «Глаза: карие» и т.п.
 const DICT_RX={en:[
@@ -1814,33 +1812,35 @@ $('introSkip').onclick=finishIntro;
 /* ---------- интро-слайдшоу ----------
    Не анимация, а «вайбовое» слайдшоу: каждый кадр медленно наезжает/плывёт (Ken Burns), кадры сменяются наплывом,
    поверх пишутся слова — по буквам, рукописным шрифтом. Зерно дёргается 8 раз в секунду, как маркерный контур.
-   Кадры — intro/frames/NN.jpg (из Nano Banana, 1920 px). Чтобы добавить кадр или поменять текст — правь INTRO.
-   Поля кадра: f — номер файла; z — масштаб [в начале, в конце]; x — сдвиг по горизонтали в % [в начале, в конце];
-   o — точка, к которой наезжаем; t — сколько секунд минимум; shake — кадр трясётся (звонок);
-   vo — файл озвучки (кадр длится, пока она не закончится); say — что пишется поверх:
-   {n:'…'} — голос рассказчика, {g:'…'} — гостья, {k:'…'} — Кнопка, {sfx:'…',at:[x%,y%]} — звук-каракуля, {title:'…'} — название. */
+   Кадры — intro/frames/NN.jpg (из Nano Banana, 1920 px), порядок и подписи — по доске «Интро · раскадровка» в Figma.
+   Чтобы добавить кадр или поменять текст — правь INTRO.
+   Поля кадра: f — номер картинки; v — видео вместо картинки (intro/frames/…mp4, без звука; f — его первый кадр, пока грузится);
+   z — масштаб [в начале, в конце]; x — сдвиг по горизонтали в % [в начале, в конце]; o — точка, к которой наезжаем;
+   t — сколько секунд минимум; shake — кадр трясётся (звонок); vo — файл озвучки (кадр длится, пока она не закончится);
+   say — что пишется поверх: {n:'…'} — рассказчик, {g:'…'} — гостья, {k:'…'} — Кнопка,
+   {sfx:'…',at:[x%,y%]} — звук-каракуля, {title:'…'} — название. Несколько реплик подряд сменяют друг друга в одном стикере. */
 const INTRO=[
-  {f:1,  z:[1,1.12],    o:'50% 62%', t:4.2},
-  {f:2,  z:[1,1.16],    o:'48% 46%', t:3.6},
+  {f:1,  v:'00.mp4', say:[{n:'Добро пожаловать…'}]},
+  {f:2,  z:[1,1.16],    o:'48% 46%', t:3.6, say:[{n:'…в мою жизнь.'}]},
   {f:3,  z:[1.04,1.16], o:'52% 58%', t:3.8},
-  {f:4,  z:[1.1,1.1],   x:[3,-3],    say:[{n:'Каждый день одни и те же лица,'},{n:'одни и те же разговоры.'}]},
-  {f:5,  z:[1.12,1.02], o:'40% 55%', say:[{n:'Один и тот же кофе.'}]},
-  {f:6,  z:[1.1,1.1],   x:[-3,3],    t:4.2},
+  {f:4,  z:[1.1,1.1],   x:[3,-3],    say:[{n:'Каждый день одни и те же лица,'}]},
+  {f:5,  z:[1.12,1.02], o:'40% 55%', say:[{n:'одни и те же разговоры'}]},
+  {f:6,  z:[1.1,1.1],   x:[-3,3],    t:4.2, say:[{n:'и чужие исполненные мечты.'}]},
   {f:7,  z:[1,1.1],     o:'42% 25%', t:2.8, shake:1, say:[{sfx:'дзынь!',at:[50,14]}]},
   {f:8,  z:[1,1.12],    o:'50% 45%', t:3.8},
-  {f:9,  z:[1.02,1.1],  o:'56% 40%', say:[{g:'Миленько тут у вас. Капучино средний, пожалуйста.'}]},
-  {f:10, z:[1.08,1.08], x:[2,-2],    say:[{k:'Вы не местная, да? Я тут всех знаю)))'}]},
-  {f:11, z:[1,1.1],     o:'45% 55%', say:[{g:'Когда-то была)) Вот, приехала брата навестить.'}]},
-  {f:12, z:[1,1.08],    o:'50% 35%', say:[{k:'Простите за допрос… а почему вы уехали? И как?'}]},
-  {f:13, z:[1.04,1.14], o:'48% 40%', say:[{g:'Хо-хо, дорогая! Я мечтала покорять мир и большие города…'}]},
-  {f:14, z:[1,1.2],     o:'50% 45%', say:[{g:'…и однажды просто решилась на свою мечту и вышла из-за барной стойки)))'}]},
-  {f:15, z:[1.1,1],     o:'50% 50%', t:3.4},
+  {f:9,  z:[1.02,1.1],  o:'56% 40%', say:[{g:'Миленько тут у вас.'}]},
+  {f:10, z:[1.08,1.08], x:[2,-2],    say:[{g:'Капучино средний, пожалуйста.'}]},
+  {f:11, z:[1,1.1],     o:'45% 55%', t:3, say:[{sfx:'пшшшшшш',at:[8,10]}]},
+  {f:12, z:[1,1.08],    o:'50% 40%', say:[{k:'Вы не местная, да? Я тут всех знаю)))'}]},
+  {f:13, z:[1.04,1.14], o:'48% 40%', say:[{g:'Когда-то была)) Но вот, приехала брата навестить)'}]},
+  {f:14, z:[1,1.22],    o:'50% 45%', say:[{k:'А как вы смогли отсюда уехать?'},{k:'Мне кажется, что я никогда отсюда не вырвусь… денег хватает только на жизнь здесь…'},{k:'…да и кто я, чтобы даже мечтать о больших городах…'}]},
+  {f:15, z:[1.1,1],     o:'50% 45%', say:[{g:'Хо-хо, дорогая, не закапывай себя так!'},{g:'Все мы достойны любых мечтаний.'},{g:'Однажды нужно лишь сделать свой первый шаг наружу, а потом продолжать играть)))'}]},
   {f:16, z:[1.08,1.08], x:[-2,2],    t:3.6},
   {f:17, z:[1,1.15],    o:'25% 45%', t:4},
   {f:18, z:[1,1.18],    o:'50% 45%', t:6, say:[{title:'KHROM City'}]},
 ];
 const SHOW={on:false,i:-1,timer:0,textEnd:0,audio:null}, CH_N=.055, CH_D=.035;
-const showEl=$('introShow'), showSlides=$('showSlides'), showText=$('showText'), showBar=$('showBar');
+const showEl=$('introShow'), showSlides=$('showSlides'), showText=$('showText');
 const frameSrc=f=>'intro/frames/'+String(f).padStart(2,'0')+'.jpg';
 const sayStr=l=>tr(l.n||l.g||l.k||l.sfx||l.title||''); // tr — перевод на выбранный язык
 function inkText(str,delay,per){ // буквы проявляются по одной, как будто их пишут
@@ -1856,7 +1856,6 @@ function startShow(){
 }
 function runShow(){
   SHOW.on=true; showEl.hidden=false; showSlides.innerHTML=''; showText.innerHTML='';
-  showBar.innerHTML=INTRO.map(()=>'<i></i>').join('');
   $('showHint').style.opacity=1; setTimeout(()=>$('showHint').style.opacity=0,4000);
   INTRO.slice(0,3).forEach(s=>{ new Image().src=frameSrc(s.f); });
   showSlide(0);
@@ -1868,31 +1867,40 @@ function showSlide(i){
   SHOW.i=i; const s=INTRO[i], say=s.say||[];
   // сколько кадр висит: дописать все строки + время прочитать
   let t=.5, html='';
-  const lines=say.map(l=>{ const d=t, per=l.n||l.title?CH_N:CH_D; t+=sayStr(l).length*per+.45; return {l,d,per}; });
+  const lines=say.map(l=>{ const d=t, len=sayStr(l).length, per=l.n||l.title?CH_N:CH_D;
+    t+=len*per+(l.g||l.k?.9+len*.03:.45); return {l,d,per}; }); // реплике — время прочитать до следующей
   const narr=lines.filter(x=>x.l.n);
   if(narr.length) html+=`<p class="say-n">${narr.map(x=>`<span>${inkText(sayStr(x.l),x.d,x.per)}</span>`).join('')}</p>`;
-  lines.forEach(({l,d,per})=>{
-    if(l.g||l.k){ const g=!!l.g; html+=`<div class="say-d ${g?'r':'l'}" style="animation-delay:${d-.15}s"><span class="who" style="--c:var(${g?'--peach':'--butter'})">${g?tr('гостья'):(state.name||tr('Кнопка'))}</span>${inkText(sayStr(l),d+.1,per)}</div>`; }
+  lines.forEach(({l,d,per},k)=>{
+    if(l.g||l.k){ const g=!!l.g, nx=lines[k+1], same=nx&&(nx.l.g||nx.l.k);
+      // реплики подряд: следующая сменяет предыдущую в том же стикере
+      const anim=`pop .35s cubic-bezier(.3,1.6,.5,1) ${(d-.15).toFixed(2)}s both`+(same?`, bubout .25s ${(nx.d-.3).toFixed(2)}s forwards`:'');
+      html+=`<div class="say-d ${g?'r':'l'}" style="animation:${anim}"><span class="who" style="--c:var(${g?'--peach':'--butter'})">${g?tr('гостья'):(state.name||tr('Кнопка'))}</span>${inkText(sayStr(l),d+.1,per)}</div>`; }
     if(l.sfx) html+=`<span class="say-sfx" style="left:${l.at[0]}%;top:${l.at[1]}%">${inkText(sayStr(l),d,.06)}</span>`;
     if(l.title) html+=`<p class="say-t"><span>${inkText(l.title,d+.6,.09)}</span></p>`;
   });
   SHOW.textEnd=say.length?performance.now()+t*1000:0;
-  const read=say.reduce((a,l)=>a+sayStr(l).length*.03,0);
-  const dur=Math.max(s.t||3.5, t+read+1.4);
+  const read=say.reduce((a,l)=>a+(l.g||l.k?0:sayStr(l).length*.03),0);
+  let dur=Math.max(s.t||3.5, t+read+1.4);
   // кадр: новый поверх старого, наплыв
-  const fig=document.createElement('figure'); fig.className='slide'+(s.shake?' shake':'');
+  const fig=document.createElement('figure'); fig.className='slide'+(s.shake?' shake':'')+(s.v?' vid':'');
   const z=s.z||[1,1.1], x=s.x||[0,0];
   fig.style.cssText=`--d:${dur+1.2}s;--z0:${z[0]};--z1:${z[1]};--x0:${x[0]}%;--x1:${x[1]}%;--o:${s.o||'50% 50%'}`;
-  fig.innerHTML=`<img src="${frameSrc(s.f)}" alt="">`;
+  fig.innerHTML=s.v?`<video src="intro/frames/${s.v}" poster="${frameSrc(s.f)}" muted playsinline autoplay preload="auto"></video>`:`<img src="${frameSrc(s.f)}" alt="">`;
   showSlides.appendChild(fig); fig.offsetWidth; fig.classList.add('on');
   [...showSlides.children].slice(0,-1).forEach(old=>{ old.classList.remove('on'); setTimeout(()=>old.remove(),1100); });
   showText.className='show-text'; showText.innerHTML=html;
-  [...showBar.children].forEach((b,k)=>{ b.className=k<i?'past':k===i?'now':''; b.style.setProperty('--d',dur+'s'); });
   const nx=INTRO[i+1]; if(nx) new Image().src=frameSrc(nx.f);
-  SHOW.timer=setTimeout(()=>showSlide(i+1),dur*1000);
+  const later=sec=>{ clearTimeout(SHOW.timer); SHOW.timer=setTimeout(()=>showSlide(i+1),sec*1000); };
+  later(dur);
+  if(s.v){ // видео: кадр длится, сколько само видео (наплыв на следующий — на последней секунде)
+    const v=fig.querySelector('video'); v.play().catch(()=>{});
+    v.onloadedmetadata=()=>{ if(SHOW.i===i) later(Math.max(dur-1.4,v.duration-.8)); };
+    v.onerror=()=>{ if(SHOW.i===i) later(dur); };
+  }
   if(s.vo){ // озвучка: кадр ждёт её конца
     const a=SHOW.audio=new Audio(s.vo); a.play().catch(()=>{});
-    a.onloadedmetadata=()=>{ if(a.duration+.6>dur){ clearTimeout(SHOW.timer); SHOW.timer=setTimeout(()=>showSlide(i+1),(a.duration+.6)*1000); const b=showBar.children[i]; b.style.setProperty('--d',(a.duration+.6)+'s'); } };
+    a.onloadedmetadata=()=>{ if(SHOW.i===i && a.duration+.6>dur) later(a.duration+.6); };
   }
 }
 function showNext(){ // пока слова пишутся — дописать сразу, иначе следующий кадр
@@ -1915,7 +1923,7 @@ const bootEl=$('boot'), menuEl=$('menu');
 const BOOT_SAY=['варим кофе…','считаем голубей…','развешиваем бельё…','ищем вторую варежку…','сдуваем пыль с карты…','качаемся на качелях…'];
 function bootThenMenu(){
   const t0=performance.now(), MIN=2200; let shown=0, sayI=0, lastSay=t0, lastBoil=0;
-  const img=new Image(); let imgOk=false; img.onload=img.onerror=()=>imgOk=true; img.src='bg/menu.jpg';
+  const img=new Image(); let imgOk=false; img.onload=img.onerror=()=>imgOk=true; img.src='bg/menu.jpg?v=2';
   let fontsOk=!document.fonts; if(document.fonts) document.fonts.ready.then(()=>fontsOk=true);
   const noise=$('boilNoise'), coffee=$('bootCoffee'), foam=$('bootFoam'), fill=$('bootFill'), pig=$('bootPigeon');
   const tick=t=>{
