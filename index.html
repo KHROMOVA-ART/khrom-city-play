@@ -216,8 +216,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.07) translate(-1.2%,-1%)}}
 .menu::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(46,36,64,.38),rgba(46,36,64,0) 55%);pointer-events:none}
 .fluff{position:absolute;inset:0;pointer-events:none;z-index:1}
-.fluff i{position:absolute;top:-4%;width:var(--s);height:var(--s);border-radius:50%;background:rgba(255,253,248,.9);box-shadow:0 0 6px rgba(255,253,248,.8);filter:blur(.3px);animation:fluff var(--d) linear infinite;animation-delay:var(--dl);left:var(--x)}
-@keyframes fluff{0%{transform:translate(0,0)}25%{transform:translate(4vw,28vh)}50%{transform:translate(-2vw,55vh)}75%{transform:translate(6vw,80vh)}100%{transform:translate(2vw,108vh)}}
+.fluff i{position:absolute;left:0;top:0;width:var(--s);height:var(--s);margin:calc(var(--s)/-2);border-radius:50%;background:#FFF6C2;
+  box-shadow:0 0 5px 2px #FFE066,0 0 16px 7px rgba(255,204,64,.7),0 0 36px 14px rgba(255,176,40,.28);will-change:transform,opacity}
 .menu-card{position:absolute;z-index:2;left:clamp(16px,7vw,110px);top:50%;transform:translateY(-50%) rotate(-1.5deg);width:min(340px,calc(100vw - 32px));background:var(--surface);border:var(--b);border-radius:18px;padding:30px 26px 24px;box-shadow:0 6px 0 var(--ink);display:grid;gap:18px;animation:cardIn .6s cubic-bezier(.3,1.4,.5,1) both}
 .menu-card::before{content:"";position:absolute;top:-12px;left:50%;width:84px;height:22px;transform:translateX(-50%) rotate(3deg);background:rgba(249,208,220,.85)}
 @keyframes cardIn{from{opacity:0;transform:translateY(-40%) rotate(-6deg)}to{opacity:1;transform:translateY(-50%) rotate(-1.5deg)}}
@@ -283,6 +283,32 @@ button{font:inherit;color:inherit;cursor:pointer}
 .intro-stub ol{margin:4px 0 0;padding-left:22px;text-align:left;display:grid;gap:3px;font-size:14px;color:var(--ink);max-width:52ch}
 .intro-stub .note{margin:0}
 /* интро-слайдшоу: кадры с медленным наездом, слова пишутся поверх */
+/* карта мира: фон 1456×816 вписан в экран целиком, остановки стоят в процентах от картинки (координаты из Figma) */
+.wmap{position:fixed;inset:0;z-index:22;overflow:hidden;background:#1F2A1E}
+.wmap::before{content:"";position:absolute;inset:-6%;background:url(bg/worldmap.jpg?v=2) center/cover;filter:blur(22px) brightness(.5) saturate(.8)}
+.wm-frame{position:absolute;left:50%;top:50%;width:min(100vw,178.43vh);aspect-ratio:1456/816;transform:translate(-50%,-50%);background:url(bg/worldmap.jpg?v=2) center/100% 100%;
+  animation:wmIn .5s cubic-bezier(.3,1.3,.5,1) both}
+@keyframes wmIn{from{opacity:0;transform:translate(-50%,-48%) scale(.97)}}
+.wm-stop{position:absolute;padding:0;border:0;background:none;cursor:pointer;transition:transform .25s cubic-bezier(.3,1.6,.5,1),filter .25s;filter:drop-shadow(0 .3cqw .4cqw rgba(46,36,64,.35))}
+.wm-frame{container-type:inline-size}
+.wm-stop img{display:block;width:100%;height:100%;pointer-events:none;user-select:none}
+.wm-stop.flip img{transform:scaleX(-1)}
+.wm-stop:hover,.wm-stop:focus-visible{transform:translateY(-4%) scale(1.05);filter:drop-shadow(0 .8cqw 1cqw rgba(46,36,64,.4)) drop-shadow(0 0 1.2cqw rgba(255,240,190,.9));outline:none}
+.wm-label{position:absolute;left:50%;bottom:6%;transform:translateX(-50%) rotate(-2deg);white-space:nowrap;background:var(--surface);border:var(--b);border-radius:99px;padding:2px 10px;
+  font-family:var(--hand);font-weight:700;font-size:max(14px,1.35cqw);color:var(--ink);box-shadow:var(--sh-s);pointer-events:none}
+.wm-stop.locked .wm-label{background:var(--lav);color:var(--ink)}
+.wm-pin{position:absolute;left:50%;top:-6%;translate:-50% 0;background:var(--marker);color:#fff;border:var(--b);border-radius:12px 12px 12px 2px;padding:3px 10px;font-weight:800;font-size:max(11px,.95cqw);
+  white-space:nowrap;box-shadow:var(--sh-s);pointer-events:none;animation:pinBob 1.6s ease-in-out infinite alternate}
+@keyframes pinBob{to{translate:-50% -25%}}
+.wm-title{position:absolute;left:16px;top:14px;background:var(--surface);border:var(--b);border-radius:16px;padding:8px 16px 9px;box-shadow:var(--sh);transform:rotate(-1.5deg);display:grid}
+.wm-title b{font-family:var(--display);font-size:20px;letter-spacing:.01em}
+.wm-title span{font-family:var(--hand);font-size:17px;color:var(--marker)}
+.wm-close{position:absolute;right:16px;top:16px;background:var(--surface);border:var(--b);border-radius:99px;padding:8px 16px;font-weight:800;font-size:14px;box-shadow:var(--sh-s);cursor:pointer}
+.wm-close:hover{background:var(--butter)}
+.wm-say{position:absolute;left:50%;bottom:18px;transform:translateX(-50%) rotate(-1deg);margin:0;background:var(--ink);color:var(--surface);border:var(--b);border-radius:14px;padding:9px 16px;
+  font-weight:700;box-shadow:0 4px 0 var(--lav-2);opacity:0;transition:opacity .3s;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+.wm-say.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.wm-frame,.wm-pin{animation:none}.wm-stop{transition:none}}
 .show{position:fixed;inset:0;z-index:25;background:#16121E;overflow:hidden;cursor:pointer;user-select:none}
 .show-frame{position:absolute;left:50%;top:50%;width:min(100vw,177.78vh);aspect-ratio:16/9;transform:translate(-50%,-50%);overflow:hidden;container-type:inline-size}
 .slide{position:absolute;inset:0;margin:0;opacity:0;transition:opacity 1s ease}
@@ -360,7 +386,7 @@ button{font:inherit;color:inherit;cursor:pointer}
             <ol>
               <li><button data-go="home"><i></i>Квартира</button></li>
               <li><button data-go="street"><i></i>Улица<small>тест</small></button></li>
-              <li><button disabled><i></i>Карта остановок<small>скоро</small></button></li>
+              <li><button id="goMap"><i></i>Карта мира</button></li>
             </ol>
             <button class="restart" id="restart">↺ главное меню</button>
           </div>
@@ -512,6 +538,14 @@ button{font:inherit;color:inherit;cursor:pointer}
   </div>
 </div>
 
+<section class="wmap" id="wmap" hidden aria-label="Карта мира">
+  <div class="wm-frame" id="wmFrame">
+    <div class="wm-stops" id="wmStops"></div>
+  </div>
+  <div class="wm-title"><b>Карта мира</b><span>выбери остановку</span></div>
+  <button class="wm-close" id="wmClose">← назад</button>
+  <p class="wm-say" id="wmSay" aria-live="polite"></p>
+</section>
 <div class="start" id="start" hidden>
   <div class="step" id="stepHero">
     <div class="wordmark">KHROM City</div>
@@ -608,7 +642,8 @@ const DICT={en:{
   // шапка, режимы, меню «куда»
   'Квартира':'Home','куда ▾':'go ▾','куда':'go to','Улица':'Street','тест':'test','Карта остановок':'Stop map','скоро':'soon',
   '↺ главное меню':'↺ main menu','Ходить':'Walk','Гардероб':'Wardrobe','Режим':'Mode','Сцена KHROM City':'KHROM City scene',
-  'Хромов переулок':'Khromov Lane','← домой':'← home','двор':'yard','Двор откроется позже':'The yard opens later',
+  'Хромов переулок':'Khromov Lane','Карта мира':'World map','выбери остановку':'pick a stop','← назад':'← back','Родной городок':'Hometown','ты здесь':'you are here',
+  'Эта остановка откроется позже':'This stop opens later','Остановка откроется позже':'Stop opens later','← домой':'← home','двор':'yard','Двор откроется позже':'The yard opens later',
   'твоя квартира · ходи стрелками или WASD · шкаф — переодеться · дверь — во двор':'your home · walk with arrows or WASD · wardrobe — change clothes · door — to the yard',
   'тестовая улица · ходи стрелками или WASD · дом слева внизу':'test street · walk with arrows or WASD · home is bottom left',
   'кликни по полу — Хромчик пойдёт':'click the floor to walk','тяни, чтобы покрутить':'drag to spin',
@@ -1272,7 +1307,7 @@ canvas.addEventListener('pointerup',e=>{
 const KEYS={ArrowUp:'u',KeyW:'u',ArrowDown:'d',KeyS:'d',ArrowLeft:'l',KeyA:'l',ArrowRight:'r',KeyD:'r'};
 const held=new Set(); let kbWasIn=null, kbNetT=0;
 function kbBlocked(){ const a=document.activeElement;
-  return (a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.isContentEditable)) || !startEl.hidden || !menuEl.hidden || !bootEl.classList.contains('out'); }
+  return (a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.isContentEditable)) || !startEl.hidden || !menuEl.hidden || !document.getElementById('wmap').hidden || !bootEl.classList.contains('out'); }
 addEventListener('keydown',e=>{ const k=KEYS[e.code]; if(!k||e.metaKey||e.ctrlKey||e.altKey||kbBlocked()) return;
   e.preventDefault(); held.add(k); if(mode==='city'){ target=null; pending=null; document.getElementById('hint').style.opacity=0; } });
 addEventListener('keyup',e=>{ const k=KEYS[e.code]; if(k) held.delete(k); });
@@ -1914,6 +1949,32 @@ addEventListener('keydown',e=>{ if(!SHOW.on) return;
   else if(e.key==='ArrowLeft'){ e.preventDefault(); showSlide(SHOW.i-1); }
   else if(e.key==='Escape') finishIntro();
 });
+/* ---------- карта мира ----------
+   Фон bg/worldmap.jpg и шесть остановок — макет Figma «генератив Хромова», узел 387:439 (координаты в пикселях картинки 1456×816).
+   Открыта пока только остановка 1 — родной городок (советский дворик) → квартира. Остальные без названий, «откроется позже».
+   Порядок в массиве = порядок слоёв в Figma (позже — выше). */
+const STOPS=[
+  {n:1, x:331, y:618, s:144, name:'Родной городок', go:'home'},
+  {n:2, x:240, y:345, s:182, flip:1},
+  {n:3, x:663, y:310, s:166},
+  {n:4, x:403, y:257, s:177},
+  {n:5, x:1144,y:291, s:286},
+  {n:6, x:663, y:424, s:278},
+];
+const wmEl=$('wmap'), wmSay=$('wmSay'); let wmSayT=0;
+$('wmStops').innerHTML=STOPS.map((p,i)=>`<button class="wm-stop${p.go?'':' locked'}${p.flip?' flip':''}" data-i="${i}"
+  style="left:${(p.x/14.56).toFixed(3)}%;top:${(p.y/8.16).toFixed(3)}%;width:${(p.s/14.56).toFixed(3)}%;height:${(p.s/8.16).toFixed(3)}%"
+  aria-label="${p.name||'Остановка откроется позже'}"><img src="bg/map/stop${p.n}.png" alt="" draggable="false">
+  ${p.go==='home'?'<span class="wm-pin">ты здесь</span>':''}<span class="wm-label">${p.name||'?'}</span></button>`).join('');
+function wmToast(t){ wmSay.textContent=t; wmSay.classList.add('on'); clearTimeout(wmSayT); wmSayT=setTimeout(()=>wmSay.classList.remove('on'),2400); }
+function openMap(){ metroMenu.hidden=true; stBtn.setAttribute('aria-expanded',false); target=null; held.clear(); wmEl.hidden=false; $('wmClose').focus(); }
+function closeMap(){ wmEl.hidden=true; wmSay.classList.remove('on'); stBtn.focus(); }
+$('goMap').onclick=openMap;
+$('wmClose').onclick=closeMap;
+$('wmStops').onclick=e=>{ const b=e.target.closest('.wm-stop'); if(!b) return; const p=STOPS[+b.dataset.i];
+  if(!p.go){ wmToast('Эта остановка откроется позже'); return; }
+  closeMap(); if(p.go!==loc.id) travel(p.go); };
+addEventListener('keydown',e=>{ if(e.key==='Escape'&&!wmEl.hidden) closeMap(); });
 $('restart').onclick=()=>{ metroMenu.hidden=true; stBtn.setAttribute('aria-expanded',false); showMenu(); };
 
 /* ---------- загрузка → главное меню ----------
@@ -1941,9 +2002,28 @@ function bootThenMenu(){
   requestAnimationFrame(tick);
 }
 function showMenu(){ startEl.hidden=true; menuEl.hidden=false; $('mStart').focus(); }
-// тополиный пух — летний московский двор
-(()=>{ const f=$('fluff'); for(let i=0;i<26;i++){ const s=document.createElement('i'); const sz=3+Math.random()*6;
-  s.style.cssText=`--s:${sz}px;--x:${Math.random()*100}%;--d:${14+Math.random()*16}s;--dl:${-Math.random()*30}s;opacity:${.5+Math.random()*.5}`; f.appendChild(s); } })();
+// светлячки над летним двором: каждый летает сам по себе — плавно поворачивает, иногда дёргается в сторону
+// или зависает, мерцает в своём ритме. Держатся ниже крыш (у деревьев и травы). Считаем только пока меню видно.
+(()=>{ const f=$('fluff'), R=Math.random, flies=[];
+  for(let i=0;i<22;i++){ const el=document.createElement('i'); el.style.setProperty('--s',(5+R()*4).toFixed(1)+'px'); f.appendChild(el);
+    flies.push({el, x:R(), y:.3+R()*.65, a:R()*6.28, sp:.022+R()*.03, turn:0, rest:0, ph:R()*6.28, fq:.6+R()*1.4}); }
+  let last=0;
+  const step=now=>{ requestAnimationFrame(step); if(menuEl.hidden) { last=0; return; }
+    const dt=last?Math.min(.05,(now-last)/1000):0, t=now/1000; last=now;
+    const W=f.clientWidth, H=f.clientHeight, k=H/Math.max(1,W);
+    for(const p of flies){
+      if(!reduce){
+        p.turn+=(R()-.5)*7*dt; p.turn*=Math.pow(.25,dt); p.a+=p.turn*dt*3;              // плавное блуждание
+        if(R()<dt*.35) p.a+=(R()-.5)*2.6;                                             // резкий рывок в сторону
+        if(p.rest>0) p.rest-=dt; else if(R()<dt*.08) p.rest=.6+R()*1.4;               // иногда зависает
+        const v=p.rest>0?p.sp*.15:p.sp;
+        p.x+=Math.cos(p.a)*v*dt*k; p.y+=Math.sin(p.a)*v*dt;
+        if(p.x<.02||p.x>.98) p.a=Math.PI-p.a; if(p.y<.28||p.y>.97) p.a=-p.a;          // отскок от краёв зоны
+        p.x=Math.min(.98,Math.max(.02,p.x)); p.y=Math.min(.97,Math.max(.28,p.y)); }
+      const s=.5+.5*Math.sin(t*p.fq*2.2+p.ph), glow=.3+.7*Math.sqrt(s);                // мерцание: больше светит, ненадолго притухает
+      p.el.style.transform=`translate(${(p.x*W).toFixed(1)}px,${(p.y*H).toFixed(1)}px) scale(${(.7+.4*glow).toFixed(2)})`;
+      p.el.style.opacity=glow.toFixed(2); } };
+  requestAnimationFrame(step); })();
 $('mStart').onclick=()=>{ menuEl.hidden=true; if(!state.hero) showStart(); else toast('С возвращением, '+(state.name||'Кнопка')+'!'); };
 function renderMenuContour(){ $('mContour').innerHTML=CONTOURS.map((c,i)=>`<button data-i="${i}" aria-pressed="${i===contourIdx}">${c.name}</button>`).join(''); }
 $('mContour').onclick=e=>{ const b=e.target.closest('[data-i]'); if(!b) return; contourIdx=+b.dataset.i; applyContour(); save(); renderMenuContour(); };
